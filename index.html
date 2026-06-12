@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Bedrock AgentCore — Architecture</title>
+<style>
+  :root{
+    --bg:#070b14;
+    --panel:#0b1220;
+    --cyan:#22d3ee;
+    --magenta:#e879f9;
+    --green:#34d399;
+    --amber:#fbbf24;
+    --violet:#a78bfa;
+    --rose:#fb7185;
+    --blue:#60a5fa;
+    --ink:#e6edf7;
+    --muted:#8b9cb8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 70% -10%, rgba(34,211,238,.07), transparent 60%),
+      radial-gradient(900px 500px at 10% 110%, rgba(232,121,249,.06), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height:100vh;
+  }
+  header{
+    text-align:center;
+    padding:26px 16px 6px;
+  }
+  header h1{
+    font-size:26px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    background:linear-gradient(90deg,var(--cyan),var(--magenta));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 30px rgba(34,211,238,.25);
+  }
+  header p{color:var(--muted);font-size:13px;margin-top:6px;}
+  header p b{color:var(--cyan);font-weight:600;}
+
+  /* ===== diagram canvas ===== */
+  .wrap{overflow-x:auto;padding:10px 20px 40px;}
+  #canvas{
+    position:relative;
+    width:1480px;
+    height:1010px;
+    margin:0 auto;
+  }
+  #wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
+
+  /* ===== blocks ===== */
+  .block{
+    position:absolute;
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), var(--panel);
+    border:1.5px solid var(--c, var(--cyan));
+    border-radius:12px;
+    box-shadow:
+      0 0 10px color-mix(in srgb, var(--c, var(--cyan)) 35%, transparent),
+      inset 0 0 18px color-mix(in srgb, var(--c, var(--cyan)) 8%, transparent);
+    padding:10px 12px;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+    z-index:2;
+  }
+  .block:hover{
+    transform:translateY(-2px);
+    box-shadow:
+      0 0 22px color-mix(in srgb, var(--c, var(--cyan)) 60%, transparent),
+      inset 0 0 22px color-mix(in srgb, var(--c, var(--cyan)) 12%, transparent);
+  }
+  .block .tag{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    color:var(--c, var(--cyan));
+    text-shadow:0 0 8px color-mix(in srgb, var(--c, var(--cyan)) 70%, transparent);
+    margin-bottom:4px;
+  }
+  .block .sub{font-size:11px;color:var(--muted);line-height:1.35;}
+  .hint{
+    position:absolute;top:8px;right:10px;font-size:10px;color:var(--muted);
+    border:1px solid rgba(139,156,184,.35);border-radius:8px;padding:1px 6px;opacity:.75;
+  }
+
+  /* nested sub-boxes */
+  .subbox{
+    margin-top:8px;
+    border:1px dashed color-mix(in srgb, var(--c, var(--cyan)) 55%, transparent);
+    border-radius:8px;
+    padding:7px 9px;
+    background:rgba(255,255,255,.02);
+  }
+  .subbox .sb-title{
+    font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+    color:color-mix(in srgb, var(--c, var(--cyan)) 80%, white);
+    margin-bottom:3px;
+  }
+  .subbox ul{list-style:none;}
+  .subbox li{
+    font-size:10.5px;color:var(--muted);line-height:1.45;
+    padding-left:12px;position:relative;
+  }
+  .subbox li::before{
+    content:"▸";position:absolute;left:0;
+    color:var(--c, var(--cyan));font-size:9px;top:1px;
+  }
+  .chiprow{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+  .chip{
+    font-size:10px;color:var(--ink);
+    border:1px solid color-mix(in srgb, var(--c, var(--cyan)) 50%, transparent);
+    border-radius:999px;padding:2px 8px;
+    background:color-mix(in srgb, var(--c, var(--cyan)) 8%, transparent);
+    white-space:nowrap;
+  }
+
+  /* big container blocks (runtime) */
+  .container-block{cursor:pointer;}
+  .container-block > .inner-zone{
+    position:absolute;inset:34px 12px 12px 12px;
+  }
+
+  /* ===== popup ===== */
+  #overlay{
+    position:fixed;inset:0;background:rgba(3,6,12,.55);
+    backdrop-filter:blur(2px);
+    display:none;z-index:50;
+  }
+  #popup{
+    position:fixed;z-index:60;display:none;
+    width:430px;max-width:92vw;max-height:78vh;overflow-y:auto;
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)), #0a101e;
+    border:1.5px solid var(--pc, var(--cyan));
+    border-radius:14px;
+    box-shadow:0 0 35px color-mix(in srgb, var(--pc, var(--cyan)) 45%, transparent), 0 18px 50px rgba(0,0,0,.6);
+    padding:18px 20px 16px;
+    animation:pop .18s ease;
+  }
+  @keyframes pop{from{opacity:0;transform:scale(.94) translateY(6px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  #popup h2{
+    font-size:16px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--pc, var(--cyan));
+    text-shadow:0 0 10px color-mix(in srgb, var(--pc, var(--cyan)) 70%, transparent);
+    margin-bottom:4px;padding-right:28px;
+  }
+  #popup .lead{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;}
+  #popup h3{
+    font-size:12px;letter-spacing:1px;text-transform:uppercase;
+    color:var(--ink);margin:12px 0 5px;
+    border-left:3px solid var(--pc, var(--cyan));padding-left:8px;
+  }
+  #popup ul{list-style:none;margin-left:4px;}
+  #popup li{
+    font-size:12px;color:#c4d0e2;line-height:1.55;
+    padding-left:14px;position:relative;margin-bottom:3px;
+  }
+  #popup li::before{content:"›";position:absolute;left:0;color:var(--pc, var(--cyan));}
+  #popup li b{color:var(--ink);}
+  #popup li ul{margin-top:3px;margin-bottom:5px;}
+  #popup li li{font-size:11.5px;color:var(--muted);}
+  #popup li li::before{content:"·";}
+  #closeBtn{
+    position:absolute;top:10px;right:12px;
+    background:none;border:1px solid rgba(139,156,184,.4);color:var(--muted);
+    width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:13px;line-height:1;
+  }
+  #closeBtn:hover{color:var(--ink);border-color:var(--ink);}
+
+  /* wire labels */
+  .wire-label{
+    font-size:10.5px;font-weight:600;letter-spacing:.4px;
+    paint-order:stroke;stroke:#070b14;stroke-width:4px;
+  }
+  .legend{
+    width:1480px;margin:0 auto 8px;display:flex;gap:18px;flex-wrap:wrap;
+    font-size:11px;color:var(--muted);padding:0 4px;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{display:inline-block;width:22px;height:0;border-top:2px solid;}
+  .legend i.dash{border-top-style:dashed;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Amazon Bedrock AgentCore</h1>
+  <p>Modular services for deploying & operating AI agents at scale — <b>click any component</b> for details</p>
+</header>
+
+<div class="wrap">
+<div class="legend">
+  <span><i style="border-color:var(--cyan)"></i> invocation / data flow</span>
+  <span><i class="dash" style="border-color:var(--amber)"></i> auth flow</span>
+  <span><i class="dash" style="border-color:var(--rose)"></i> telemetry / governance</span>
+</div>
+<div id="canvas">
+  <svg id="wires"></svg>
+
+  <!-- ===================== Client ===================== -->
+  <div class="block" id="client" data-detail="client" style="--c:var(--blue); left:20px; top:120px; width:190px; height:150px;">
+    <span class="hint">i</span>
+    <span class="tag">Client / Caller</span>
+    <span class="sub">End user app, another agent, or a service</span>
+    <div class="chiprow">
+      <span class="chip">HTTPS</span><span class="chip">MCP</span><span class="chip">A2A</span>
+    </div>
+  </div>
+
+  <!-- ===================== Identity ===================== -->
+  <div class="block" id="identity" data-detail="identity" style="--c:var(--amber); left:20px; top:360px; width:230px; height:240px;">
+    <span class="hint">i</span>
+    <span class="tag">AgentCore Identity</span>
+    <span class="sub">Agent identity, auth & token vault</span>
+    <div class="subbox">
+      <div class="sb-title">Inbound Auth</div>
+      <ul><li>IAM SigV4 / OAuth JWT</li><li>Okta, Entra ID, Cognito</li></ul>
+    </div>
+    <div class="subbox">
+      <div class="sb-title">Outbound Auth</div>
+      <ul><li>OAuth 2LO / 3LO</li><li>API keys · token vault</li></ul>
+    </div>
+  </div>
+
+  <!-- ===================== Runtime (container) ===================== -->
+  <div class="block container-block" id="runtime" data-detail="runtime" style="--c:var(--cyan); left:360px; top:60px; width:520px; height:420px;">
+    <span class="hint">i</span>
+    <span class="tag">AgentCore Runtime</span>
+    <span class="sub">Serverless, session-isolated hosting for agents & tools</span>
+
+    <div class="block" id="microvm" data-detail="microvm" style="--c:var(--cyan); left:14px; top:74px; width:300px; height:328px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11.5px;">Session microVM</span>
+      <span class="sub">1 user session = 1 isolated microVM</span>
+      <div class="subbox">
+        <div class="sb-title">Agent Loop</div>
+        <ul>
+          <li>Any framework: Strands, LangGraph, CrewAI…</li>
+          <li>Reason → act → observe</li>
+          <li>Up to 8h async workloads</li>
+        </ul>
+      </div>
+      <div class="subbox">
+        <div class="sb-title">Isolation</div>
+        <ul>
+          <li>Dedicated CPU / RAM / filesystem</li>
+          <li>microVM destroyed & memory sanitized at session end</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block" id="model" data-detail="model" style="--c:var(--violet); left:336px; top:74px; width:168px; height:150px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11.5px;">Foundation Model</span>
+      <span class="sub">Any FM, in or outside Bedrock</span>
+      <div class="chiprow">
+        <span class="chip">Claude</span><span class="chip">Nova</span><span class="chip">GPT</span><span class="chip">Gemini</span><span class="chip">Llama</span>
+      </div>
+    </div>
+
+    <div class="block" id="endpoint" data-detail="endpoint" style="--c:var(--cyan); left:336px; top:244px; width:168px; height:158px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11.5px;">Endpoints</span>
+      <span class="sub">Versioned entry points to invoke the agent</span>
+      <div class="chiprow">
+        <span class="chip">InvokeAgentRuntime</span><span class="chip">streaming</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Gateway ===================== -->
+  <div class="block" id="gateway" data-detail="gateway" style="--c:var(--green); left:990px; top:60px; width:240px; height:300px;">
+    <span class="hint">i</span>
+    <span class="tag">AgentCore Gateway</span>
+    <span class="sub">Turns anything into MCP tools behind one endpoint</span>
+    <div class="subbox">
+      <div class="sb-title">Targets</div>
+      <ul>
+        <li>REST APIs (OpenAPI / Smithy)</li>
+        <li>AWS Lambda functions</li>
+        <li>Existing MCP servers</li>
+      </ul>
+    </div>
+    <div class="subbox">
+      <div class="sb-title">Built-in</div>
+      <ul><li>Semantic tool search</li><li>Credential injection</li></ul>
+    </div>
+  </div>
+
+  <!-- ===================== External tools ===================== -->
+  <div class="block" id="external" data-detail="external" style="--c:var(--green); left:1290px; top:80px; width:170px; height:260px;">
+    <span class="hint">i</span>
+    <span class="tag" style="font-size:11.5px;">External Tools & APIs</span>
+    <span class="sub">3rd-party & internal services</span>
+    <div class="chiprow">
+      <span class="chip">Slack</span><span class="chip">Jira</span><span class="chip">Salesforce</span>
+      <span class="chip">GitHub</span><span class="chip">Zoom</span><span class="chip">Internal APIs</span>
+    </div>
+  </div>
+
+  <!-- ===================== Built-in tools ===================== -->
+  <div class="block" id="tools" data-detail="tools" style="--c:var(--violet); left:990px; top:420px; width:240px; height:200px;">
+    <span class="hint">i</span>
+    <span class="tag">Built-in Tools</span>
+    <span class="sub">Managed, sandboxed tool services</span>
+    <div class="subbox">
+      <div class="sb-title">Browser</div>
+      <ul><li>Cloud browser in a secure VM</li></ul>
+    </div>
+    <div class="subbox">
+      <div class="sb-title">Code Interpreter</div>
+      <ul><li>Sandboxed Python / JS / TS execution</li></ul>
+    </div>
+  </div>
+
+  <!-- ===================== Memory ===================== -->
+  <div class="block" id="memory" data-detail="memory" style="--c:var(--magenta); left:360px; top:560px; width:520px; height:280px;">
+    <span class="hint">i</span>
+    <span class="tag">AgentCore Memory</span>
+    <span class="sub">Managed short-term context & long-term knowledge</span>
+
+    <div class="block" id="stm" data-detail="stm" style="--c:var(--magenta); left:14px; top:70px; width:230px; height:192px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11px;">Short-Term Memory</span>
+      <div class="subbox">
+        <div class="sb-title">Raw events</div>
+        <ul>
+          <li>Conversation history (turn by turn)</li>
+          <li>State & checkpoints</li>
+          <li>Scoped per session / actor</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block" id="ltm" data-detail="ltm" style="--c:var(--rose); left:274px; top:70px; width:230px; height:192px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11px;">Long-Term Memory</span>
+      <div class="subbox">
+        <div class="sb-title">Pipeline</div>
+        <ul>
+          <li>Strategy (what to extract)</li>
+          <li>Extraction (LLM pulls insights)</li>
+          <li>Consolidation (add / update / skip)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Policy ===================== -->
+  <div class="block" id="policy" data-detail="policy" style="--c:var(--amber); left:20px; top:620px; width:230px; height:140px;">
+    <span class="hint">i</span>
+    <span class="tag">AgentCore Policy</span>
+    <span class="sub">Guardrails over what agents are allowed to do</span>
+    <div class="chiprow">
+      <span class="chip">allow / deny tools</span><span class="chip">conditions</span>
+    </div>
+  </div>
+
+  <!-- ===================== Observability ===================== -->
+  <div class="block" id="obs" data-detail="obs" style="--c:var(--rose); left:360px; top:880px; width:520px; height:110px;">
+    <span class="hint">i</span>
+    <span class="tag">AgentCore Observability</span>
+    <span class="sub">End-to-end traces of every LLM call, tool call & memory access</span>
+    <div class="chiprow">
+      <span class="chip">OpenTelemetry</span><span class="chip">CloudWatch GenAI dashboards</span>
+      <span class="chip">latency · tokens · errors</span><span class="chip">Datadog / Langfuse export</span>
+    </div>
+  </div>
+
+  <!-- ===================== Evaluations ===================== -->
+  <div class="block" id="evals" data-detail="evals" style="--c:var(--blue); left:990px; top:870px; width:240px; height:130px;">
+    <span class="hint">i</span>
+    <span class="tag">Evaluations</span>
+    <span class="sub">Continuous quality scoring of agent behavior</span>
+    <div class="chiprow">
+      <span class="chip">correctness</span><span class="chip">helpfulness</span><span class="chip">tool-use quality</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- popup -->
+<div id="overlay"></div>
+<div id="popup">
+  <button id="closeBtn" title="Close">✕</button>
+  <h2 id="popupTitle"></h2>
+  <p class="lead" id="popupLead"></p>
+  <div id="popupBody"></div>
+</div>
+
+<script>
+/* ============ component details ============ */
+const DETAILS = {
+  client: {
+    color:"var(--blue)", title:"Client / Caller",
+    lead:"Whoever invokes the agent: an end-user application, a backend service, or another agent.",
+    body:`
+      <h3>Invocation protocols</h3>
+      <ul>
+        <li><b>HTTPS</b>: simple request/response or streaming invocation of the Runtime endpoint.</li>
+        <li><b>MCP</b> (Model Context Protocol): the agent itself can be exposed as an MCP server/tool.</li>
+        <li><b>A2A</b> (Agent-to-Agent): standard protocol for inter-agent communication in multi-agent systems.</li>
+      </ul>
+      <h3>Session handling</h3>
+      <ul>
+        <li>Each call carries a <b>session ID</b>; Runtime routes it to a dedicated, isolated microVM.</li>
+        <li>The caller authenticates first via AgentCore Identity (IAM or OAuth token).</li>
+      </ul>`
+  },
+  runtime: {
+    color:"var(--cyan)", title:"AgentCore Runtime",
+    lead:"A secure, serverless hosting environment purpose-built for deploying and scaling dynamic AI agents and tools.",
+    body:`
+      <h3>Key properties</h3>
+      <ul>
+        <li><b>Serverless</b>: no infrastructure to manage, scales to zero, pay per use.</li>
+        <li><b>Session isolation</b>: each user session runs in its own microVM with dedicated CPU, memory and filesystem.</li>
+        <li><b>Long-running</b>: supports asynchronous agent workloads up to 8 hours.</li>
+        <li><b>Fast cold starts</b> for real-time interactive agents.</li>
+      </ul>
+      <h3>Framework & model agnostic</h3>
+      <ul>
+        <li>Works with Strands Agents, LangGraph, LangChain, CrewAI, LlamaIndex, OpenAI Agents SDK, Google ADK or fully custom code.</li>
+        <li>Use any foundation model — inside Bedrock (Claude, Nova, Llama…) or outside (OpenAI, Gemini…).</li>
+        <li>Speaks HTTPS, MCP and A2A natively; multi-modal payloads supported.</li>
+      </ul>
+      <h3>Built-in integration</h3>
+      <ul>
+        <li>One SDK wires the agent to Memory, Gateway, Identity and Observability with no glue code.</li>
+      </ul>`
+  },
+  microvm: {
+    color:"var(--cyan)", title:"Session microVM",
+    lead:"The unit of execution and isolation inside Runtime: one user session = one dedicated microVM.",
+    body:`
+      <h3>Lifecycle</h3>
+      <ul>
+        <li><b>Start</b>: created on first invocation for a session ID (fast cold start).</li>
+        <li><b>Run</b>: hosts your agent loop — reason, call the model, call tools, observe results.</li>
+        <li><b>End</b>: after session completion the entire microVM is <b>terminated and its memory sanitized</b>, preventing cross-session data leaks.</li>
+      </ul>
+      <h3>Why it matters</h3>
+      <ul>
+        <li>Stateful reasoning (variables, files, in-flight context) is safe within the session.</li>
+        <li>Deterministic security even with non-deterministic LLM behavior.</li>
+      </ul>`
+  },
+  model: {
+    color:"var(--violet)", title:"Foundation Model",
+    lead:"The LLM that powers the agent's reasoning. AgentCore does not lock you to one provider.",
+    body:`
+      <h3>Choices</h3>
+      <ul>
+        <li><b>Bedrock models</b>: Anthropic Claude, Amazon Nova, Meta Llama, Mistral…</li>
+        <li><b>External models</b>: OpenAI GPT, Google Gemini — called over the network from the agent code.</li>
+      </ul>
+      <h3>Role in the loop</h3>
+      <ul>
+        <li>Receives the prompt = instructions + retrieved memory + tool definitions (from Gateway).</li>
+        <li>Decides next action: respond, call a tool, or store/recall memory.</li>
+      </ul>`
+  },
+  endpoint: {
+    color:"var(--cyan)", title:"Runtime Endpoints",
+    lead:"Named, versioned entry points used to invoke a deployed agent.",
+    body:`
+      <h3>Details</h3>
+      <ul>
+        <li>An agent is deployed as an <b>agent runtime</b>; each runtime has one or more <b>endpoints</b> (e.g. DEFAULT, prod, staging).</li>
+        <li>Endpoints pin a specific version, enabling safe rollout and rollback.</li>
+        <li>Invoked via <b>InvokeAgentRuntime</b> API — supports standard and streaming responses.</li>
+      </ul>`
+  },
+  identity: {
+    color:"var(--amber)", title:"AgentCore Identity",
+    lead:"Identity and credential management for agents: who may call the agent, and what the agent may access on whose behalf.",
+    body:`
+      <h3>Inbound Auth (user → agent)</h3>
+      <ul>
+        <li><b>IAM / SigV4</b> for AWS-native callers.</li>
+        <li><b>OAuth 2.0 / JWT bearer tokens</b> validated against your IdP: Okta, Microsoft Entra ID, Amazon Cognito…</li>
+        <li>Users can only reach agents they are authorized for.</li>
+      </ul>
+      <h3>Outbound Auth (agent → external services)</h3>
+      <ul>
+        <li><b>OAuth 2-legged (2LO)</b>: agent acts autonomously as itself.</li>
+        <li><b>OAuth 3-legged (3LO)</b>: agent acts on behalf of the user (consent flow), e.g. "post to my Slack".</li>
+        <li><b>API keys</b> for simpler services.</li>
+      </ul>
+      <h3>Building blocks</h3>
+      <ul>
+        <li><b>Workload identity</b>: each agent gets its own distinct identity.</li>
+        <li><b>Token vault</b>: encrypted storage of OAuth tokens & API keys, injected at call time so secrets never live in agent code.</li>
+      </ul>`
+  },
+  gateway: {
+    color:"var(--green)", title:"AgentCore Gateway",
+    lead:"A secure hub that converts your existing assets into MCP-compatible tools agents can discover and call.",
+    body:`
+      <h3>Targets (what it can wrap)</h3>
+      <ul>
+        <li><b>REST APIs</b>: import an OpenAPI or Smithy spec → instant tools.</li>
+        <li><b>AWS Lambda functions</b>: expose business logic as tools.</li>
+        <li><b>Existing MCP servers</b>: federate them behind one Gateway endpoint.</li>
+      </ul>
+      <h3>Capabilities</h3>
+      <ul>
+        <li><b>Single MCP endpoint</b>: the agent sees one tool server regardless of how many backends exist.</li>
+        <li><b>Semantic tool search</b>: with hundreds of tools, the agent can search for the right one instead of stuffing all definitions into context.</li>
+        <li><b>Credential injection</b>: Gateway pulls credentials from Identity's token vault and attaches them to outbound calls — the agent never sees raw secrets.</li>
+        <li><b>Policy enforcement</b>: an associated Policy engine intercepts each tool call and permits or denies it via Cedar rules before execution.</li>
+        <li>Inbound authorization on the Gateway endpoint itself (OAuth).</li>
+      </ul>`
+  },
+  external: {
+    color:"var(--green)", title:"External Tools & APIs",
+    lead:"The real-world systems the agent acts upon, reached through Gateway with credentials from Identity.",
+    body:`
+      <h3>Examples</h3>
+      <ul>
+        <li>SaaS: Slack, Zoom, Jira, Salesforce, GitHub…</li>
+        <li>Internal microservices and databases exposed via REST or Lambda.</li>
+        <li>Community / partner MCP servers.</li>
+      </ul>
+      <h3>Access pattern</h3>
+      <ul>
+        <li>Agent calls Gateway (MCP) → Gateway authenticates via Identity → executes the API/Lambda → returns the result to the agent.</li>
+      </ul>`
+  },
+  tools: {
+    color:"var(--violet)", title:"Built-in Tools",
+    lead:"Fully managed tool services AWS hosts for you, callable directly from agent code.",
+    body:`
+      <h3>Browser</h3>
+      <ul>
+        <li>A fast, secure <b>cloud browser</b> running in an isolated VM.</li>
+        <li>Lets agents navigate sites, fill forms and interact with web apps like a human.</li>
+        <li>Sessions are recorded/observable for auditing.</li>
+      </ul>
+      <h3>Code Interpreter</h3>
+      <ul>
+        <li><b>Sandboxed code execution</b> for Python, JavaScript and TypeScript.</li>
+        <li>Used for data analysis, file processing, math — anything better done in code than in tokens.</li>
+        <li>Isolated per session; configurable network access.</li>
+      </ul>`
+  },
+  memory: {
+    color:"var(--magenta)", title:"AgentCore Memory",
+    lead:"A fully managed memory service: complete control over what the agent remembers and learns, without building memory infrastructure.",
+    body:`
+      <h3>Short-term memory</h3>
+      <ul>
+        <li><b>Conversation history</b>: every turn stored as raw events via CreateEvent — reload the whole conversation any time.</li>
+        <li><b>State</b>: checkpoints and session state so context survives restarts within a session.</li>
+      </ul>
+      <h3>Long-term memory</h3>
+      <ul>
+        <li><b>Strategy</b>: defines what to extract — semantic facts, user preferences, session summaries, episodic insights, or your own custom prompts.</li>
+        <li><b>Extraction</b>: an async LLM process pulls key insights out of raw short-term events.</li>
+        <li><b>Consolidation</b>: retrieves related existing records and decides to <b>ADD</b> (new info), <b>UPDATE</b> (merge/refresh), or <b>SKIP</b> (redundant) — keeping memory coherent and deduplicated.</li>
+      </ul>
+      <h3>Organization & retrieval</h3>
+      <ul>
+        <li><b>Namespaces</b>: hierarchical scoping by actor / session / strategy.</li>
+        <li><b>Semantic search</b> over records via RetrieveMemoryRecords.</li>
+        <li>Memory stores can be <b>shared across multiple agents</b>.</li>
+      </ul>`
+  },
+  stm: {
+    color:"var(--magenta)", title:"Short-Term Memory",
+    lead:"Raw, turn-by-turn context that keeps the agent coherent within a session.",
+    body:`
+      <h3>Contents</h3>
+      <ul>
+        <li><b>Conversation history</b>: each user message and agent response saved as an event (CreateEvent), in order.</li>
+        <li><b>State</b>: intermediate agent state, checkpoints and branches — useful for retries and forked conversations.</li>
+      </ul>
+      <h3>Behavior</h3>
+      <ul>
+        <li>Scoped by <b>actor ID + session ID</b>.</li>
+        <li>Configurable expiration (days) for raw events.</li>
+        <li>Survives service restarts — the user can resume the same conversation seamlessly.</li>
+        <li>Feeds the async long-term extraction pipeline.</li>
+      </ul>`
+  },
+  ltm: {
+    color:"var(--rose)", title:"Long-Term Memory",
+    lead:"Structured insights extracted from conversations and persisted across sessions.",
+    body:`
+      <h3>Strategy — what to remember</h3>
+      <ul>
+        <li><b>Semantic</b>: facts and knowledge from conversations.</li>
+        <li><b>User preference</b>: likes, dislikes, settings ("prefers window seat").</li>
+        <li><b>Summary</b>: per-session conversation summaries.</li>
+        <li><b>Episodic</b>: reasoning over past episodes (with reflection).</li>
+        <li><b>Custom / override</b>: bring your own extraction & consolidation prompts and model.</li>
+      </ul>
+      <h3>Extraction</h3>
+      <ul>
+        <li>Asynchronous, LLM-driven; triggered automatically after events land in short-term memory.</li>
+        <li>Produces structured memory records in the strategy's schema.</li>
+      </ul>
+      <h3>Consolidation</h3>
+      <ul>
+        <li>Retrieves semantically similar existing records, then the LLM decides:
+          <ul>
+            <li><b>ADD</b> — information is genuinely new</li>
+            <li><b>UPDATE</b> — complements or supersedes an existing record (recent info wins)</li>
+            <li><b>SKIP / NO-OP</b> — redundant ("loves pizza" ≈ "likes pizza")</li>
+          </ul>
+        </li>
+        <li>Resolves contradictions and minimizes duplicates so memory stays clean.</li>
+      </ul>`
+  },
+  policy: {
+    color:"var(--amber)", title:"AgentCore Policy",
+    lead:"Deterministic guardrails on agent actions — enforced outside the agent's reasoning loop via Cedar policies.",
+    body:`
+      <h3>Where it applies</h3>
+      <ul>
+        <li>A <b>policy engine</b> is associated with one or more <b>AgentCore Gateways</b> (not Memory).</li>
+        <li>Every tool call through the Gateway is <b>intercepted and evaluated</b> before the tool executes.</li>
+        <li>Modes: <b>ENFORCE</b> (block violations) or <b>LOG_ONLY</b> (audit without blocking).</li>
+      </ul>
+      <h3>How it works</h3>
+      <ul>
+        <li>Uses <b>Cedar</b> — default-deny; you write explicit <b>permit</b> / <b>forbid</b> rules.</li>
+        <li>Conditions can inspect tool parameters (e.g. amount &lt; 500) and OAuth token claims.</li>
+        <li>Complements Identity: Identity says <i>who</i> you are; Policy says <i>what tool actions you may perform</i>.</li>
+      </ul>`
+  },
+  obs: {
+    color:"var(--rose)", title:"AgentCore Observability",
+    lead:"Unified tracing, debugging and monitoring for agents in production.",
+    body:`
+      <h3>What gets captured</h3>
+      <ul>
+        <li><b>End-to-end traces</b>: every reasoning step, LLM call, tool invocation and memory access as spans.</li>
+        <li><b>Metrics</b>: latency, token usage, error rates, session counts & durations.</li>
+      </ul>
+      <h3>Where it goes</h3>
+      <ul>
+        <li><b>CloudWatch GenAI Observability</b> dashboards out of the box.</li>
+        <li>Emitted in <b>OpenTelemetry (OTEL)</b> format — export to Datadog, LangSmith, Langfuse, Grafana, etc.</li>
+      </ul>
+      <h3>Why</h3>
+      <ul>
+        <li>Inspect the agent's execution path, audit intermediate outputs, find bottlenecks and failures fast.</li>
+      </ul>`
+  },
+  evals: {
+    color:"var(--blue)", title:"Evaluations",
+    lead:"Continuous quality monitoring for agent behavior in production.",
+    body:`
+      <h3>What it does</h3>
+      <ul>
+        <li>Scores live or sampled agent interactions against quality criteria: correctness, helpfulness, goal completion, tool-use quality.</li>
+        <li>Works on trajectories captured by Observability.</li>
+        <li>Surfaces regressions so you can fix prompts, tools or strategies before users notice.</li>
+      </ul>`
+  }
+};
+
+/* ============ popup logic ============ */
+const popup = document.getElementById("popup");
+const overlay = document.getElementById("overlay");
+const pTitle = document.getElementById("popupTitle");
+const pLead = document.getElementById("popupLead");
+const pBody = document.getElementById("popupBody");
+
+function openPopup(key, x, y){
+  const d = DETAILS[key];
+  if(!d) return;
+  popup.style.setProperty("--pc", d.color);
+  pTitle.textContent = d.title;
+  pLead.textContent = d.lead;
+  pBody.innerHTML = d.body;
+  overlay.style.display = "block";
+  popup.style.display = "block";
+  // position near the click, clamped to viewport
+  const pw = Math.min(430, window.innerWidth*0.92);
+  let left = Math.min(Math.max(12, x + 14), window.innerWidth - pw - 12);
+  popup.style.left = left + "px";
+  popup.style.top = "0px";
+  const ph = popup.offsetHeight;
+  let top = Math.min(Math.max(12, y - ph/3), window.innerHeight - ph - 12);
+  if (top < 12) top = 12;
+  popup.style.top = top + "px";
+}
+function closePopup(){ popup.style.display="none"; overlay.style.display="none"; }
+overlay.addEventListener("click", closePopup);
+document.getElementById("closeBtn").addEventListener("click", closePopup);
+document.addEventListener("keydown", e => { if(e.key==="Escape") closePopup(); });
+
+document.querySelectorAll("[data-detail]").forEach(el=>{
+  el.addEventListener("click", e=>{
+    e.stopPropagation();              // nested blocks open their own popup
+    openPopup(el.dataset.detail, e.clientX, e.clientY);
+  });
+});
+
+/* ============ wires (arrows with labels) ============ */
+const canvas = document.getElementById("canvas");
+const svg = document.getElementById("wires");
+
+// side: t/b/l/r ; frac: position along that side (0..1)
+const WIRES = [
+  {from:"client", fs:"r", ff:.3,  to:"runtime",  ts:"l", tf:.25, color:"var(--cyan)",  label:"invoke (HTTPS · MCP · A2A)", labelDy:-10},
+  {from:"client", fs:"b", ff:.5,  to:"identity", ts:"t", tf:.5,  color:"var(--amber)", label:"authenticate", dash:true, labelDx:8},
+  {from:"identity",fs:"r", ff:.18, to:"runtime",  ts:"l", tf:.75, color:"var(--amber)", label:"inbound auth: validate token", dash:true, labelDy:-8},
+  {from:"runtime", fs:"r", ff:.3,  to:"gateway",  ts:"l", tf:.4,  color:"var(--green)", label:"MCP tool calls", labelDy:-8},
+  {from:"gateway", fs:"r", ff:.4,  to:"external", ts:"l", tf:.4,  color:"var(--green)", label:"REST / Lambda / MCP", labelDy:-8},
+  {from:"identity",fs:"r", ff:.67, to:"gateway",  ts:"b", tf:.25, color:"var(--amber)", label:"outbound auth: OAuth / API keys", dash:true,
+   via:[{x:940,y:521},{x:940,y:395}], labelAt:{x:590,y:540}},
+  {from:"runtime", fs:"r", ff:.85, to:"tools",    ts:"l", tf:.35, color:"var(--violet)",label:"browse / run code", labelDy:-8},
+  {from:"runtime", fs:"b", ff:.3,  to:"memory",   ts:"t", tf:.3,  color:"var(--magenta)",label:"CreateEvent (store turns)", labelDx:-30, labelDy:-7},
+  {from:"memory",  fs:"t", ff:.7,  to:"runtime",  ts:"b", tf:.7,  color:"var(--magenta)",label:"RetrieveMemoryRecords", labelDx:14, labelDy:-7},
+  {from:"stm",     fs:"r", ff:.5,  to:"ltm",      ts:"l", tf:.5,  color:"var(--rose)",  label:"async extraction", labelDy:-6, inner:true},
+  {from:"policy",  fs:"b", ff:.5,  to:"gateway",  ts:"l", tf:.78, color:"var(--amber)", label:"permit / deny tool calls (Cedar)", dash:true,
+   via:[{x:135,y:852},{x:955,y:852},{x:955,y:294}], labelAt:{x:200,y:839}},
+  {from:"memory",  fs:"b", ff:.5,  to:"obs",      ts:"t", tf:.5,  color:"var(--rose)",  label:"OTEL traces & metrics", dash:true, labelDx:10, labelDy:0},
+  {from:"obs",     fs:"r", ff:.5,  to:"evals",    ts:"l", tf:.5,  color:"var(--rose)",  label:"trajectories to score", dash:true, labelDy:-8},
+];
+
+function anchor(el, side, frac){
+  const c = canvas.getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  const x = r.left - c.left, y = r.top - c.top, w = r.width, h = r.height;
+  switch(side){
+    case "t": return {x:x+w*frac, y:y,     nx:0, ny:-1};
+    case "b": return {x:x+w*frac, y:y+h,   nx:0, ny:1};
+    case "l": return {x:x,       y:y+h*frac, nx:-1, ny:0};
+    case "r": return {x:x+w,     y:y+h*frac, nx:1,  ny:0};
+  }
+}
+
+function drawWires(){
+  svg.innerHTML = "";
+  const defs = document.createElementNS("http://www.w3.org/2000/svg","defs");
+  svg.appendChild(defs);
+  const colors = {};
+  let mid = 0;
+
+  WIRES.forEach(w=>{
+    const fromEl = document.getElementById(w.from);
+    const toEl   = document.getElementById(w.to);
+    if(!fromEl || !toEl) return;
+    const a = anchor(fromEl, w.fs, w.ff);
+    const b = anchor(toEl,   w.ts, w.tf);
+
+    // arrowhead marker per color
+    const col = w.color;
+    if(!colors[col]){
+      const id = "arr"+(mid++);
+      colors[col] = id;
+      const m = document.createElementNS("http://www.w3.org/2000/svg","marker");
+      m.setAttribute("id", id);
+      m.setAttribute("viewBox","0 0 10 10");
+      m.setAttribute("refX","9"); m.setAttribute("refY","5");
+      m.setAttribute("markerWidth","7"); m.setAttribute("markerHeight","7");
+      m.setAttribute("orient","auto-start-reverse");
+      const p = document.createElementNS("http://www.w3.org/2000/svg","path");
+      p.setAttribute("d","M 0 0 L 10 5 L 0 10 z");
+      p.setAttribute("fill", col.startsWith("var") ? getComputedStyle(document.documentElement).getPropertyValue(col.slice(4,-1)).trim() : col);
+      m.appendChild(p);
+      defs.appendChild(m);
+    }
+
+    const k = w.curve !== undefined ? w.curve : 0.45;
+    const len = Math.hypot(b.x-a.x, b.y-a.y);
+    const c1x = a.x + a.nx*len*k, c1y = a.y + a.ny*len*k;
+    const c2x = b.x + b.nx*len*k, c2y = b.y + b.ny*len*k;
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+    if (w.via) {
+      const pts = [ {x:a.x,y:a.y}, ...w.via, {x:b.x,y:b.y} ];
+      path.setAttribute("d", "M " + pts.map(p=>`${p.x} ${p.y}`).join(" L "));
+      path.setAttribute("stroke-linejoin","round");
+    } else {
+      path.setAttribute("d", `M ${a.x} ${a.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${b.x} ${b.y}`);
+    }
+    path.setAttribute("fill","none");
+    path.setAttribute("stroke", col.startsWith("var") ? getComputedStyle(document.documentElement).getPropertyValue(col.slice(4,-1)).trim() : col);
+    path.setAttribute("stroke-width", w.inner ? 1.6 : 2);
+    path.setAttribute("opacity", .85);
+    if(w.dash) path.setAttribute("stroke-dasharray","6 5");
+    path.setAttribute("marker-end", `url(#${colors[col]})`);
+    path.setAttribute("filter","drop-shadow(0 0 3px rgba(255,255,255,.15))");
+    svg.appendChild(path);
+
+    // label at curve midpoint (or explicit position for waypoint wires)
+    const t = 0.5;
+    let mx, my;
+    if (w.labelAt) {
+      mx = w.labelAt.x; my = w.labelAt.y;
+    } else {
+      mx = (1-t)**3*a.x + 3*(1-t)**2*t*c1x + 3*(1-t)*t*t*c2x + t**3*b.x;
+      my = (1-t)**3*a.y + 3*(1-t)**2*t*c1y + 3*(1-t)*t*t*c2y + t**3*b.y;
+    }
+    const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+    text.setAttribute("x", mx + (w.labelDx||0));
+    text.setAttribute("y", my + (w.labelDy ?? -6));
+    text.setAttribute("text-anchor","middle");
+    text.setAttribute("class","wire-label");
+    text.setAttribute("fill", col.startsWith("var") ? getComputedStyle(document.documentElement).getPropertyValue(col.slice(4,-1)).trim() : col);
+    text.textContent = w.label;
+    svg.appendChild(text);
+  });
+}
+
+drawWires();
+window.addEventListener("resize", drawWires);
+</script>
+</body>
+</html>
