@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0031)https://chau-the-han.github.io/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AWS Bedrock AgentCore — Architecture</title>
+<title>Amazon Bedrock — Architecture</title>
 <style>
   :root{
     --bg:#070b14;
@@ -51,7 +51,13 @@
     height:1010px;
     margin:0 auto;
   }
-  #wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
+  #ba-canvas{
+    position:relative;
+    width:1480px;
+    height:1010px;
+    margin:0 auto;
+  }
+  #wires,#ba-wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;}
 
   /* ===== blocks ===== */
   .block{
@@ -184,15 +190,50 @@
   .legend span{display:inline-flex;align-items:center;gap:6px;}
   .legend i{display:inline-block;width:22px;height:0;border-top:2px solid;}
   .legend i.dash{border-top-style:dashed;}
-</style>
+
+  /* ===== tabs ===== */
+  .tabs{
+    display:flex;justify-content:center;gap:8px;
+    padding:12px 16px 4px;flex-wrap:wrap;
+  }
+  .tab-btn{
+    background:rgba(255,255,255,.03);
+    border:1.5px solid rgba(139,156,184,.35);
+    color:var(--muted);
+    font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+    padding:8px 18px;border-radius:999px;cursor:pointer;
+    transition:border-color .15s, color .15s, box-shadow .15s, background .15s;
+  }
+  .tab-btn:hover{color:var(--ink);border-color:rgba(139,156,184,.6);}
+  .tab-btn.active{
+    color:var(--cyan);
+    border-color:var(--cyan);
+    background:color-mix(in srgb, var(--cyan) 10%, transparent);
+    box-shadow:0 0 14px color-mix(in srgb, var(--cyan) 35%, transparent);
+  }
+  .tab-btn[data-tab="agents"].active{
+    color:var(--violet);
+    border-color:var(--violet);
+    background:color-mix(in srgb, var(--violet) 10%, transparent);
+    box-shadow:0 0 14px color-mix(in srgb, var(--violet) 35%, transparent);
+  }
+  .diagram-view{display:none;}
+  .diagram-view.active{display:block;}
+</style><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style lang="en" type="text/css" id="dark-mode-custom-style"></style><style lang="en" type="text/css" id="dark-mode-native-style"></style><style lang="en" type="text/css" id="dark-mode-native-sheet"></style>
 </head>
 <body>
 
 <header>
-  <h1>Amazon Bedrock AgentCore</h1>
-  <p>Modular services for deploying & operating AI agents at scale — <b>click any component</b> for details</p>
+  <h1 id="mainTitle">Amazon Bedrock AgentCore</h1>
+  <p id="mainSubtitle">Modular services for deploying &amp; operating AI agents at scale — <b>click any component</b> for details</p>
 </header>
 
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="agentcore">AgentCore</button>
+  <button class="tab-btn" data-tab="agents">Bedrock Agents</button>
+</nav>
+
+<section class="diagram-view active" id="view-agentcore">
 <div class="wrap">
 <div class="legend">
   <span><i style="border-color:var(--cyan)"></i> invocation / data flow</span>
@@ -200,7 +241,7 @@
   <span><i class="dash" style="border-color:var(--rose)"></i> telemetry / governance</span>
 </div>
 <div id="canvas">
-  <svg id="wires"></svg>
+  <svg id="wires"><defs><marker id="arr0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#22d3ee"></path></marker><marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#fbbf24"></path></marker><marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399"></path></marker><marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a78bfa"></path></marker><marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#e879f9"></path></marker><marker id="arr5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#fb7185"></path></marker></defs><path d="M 210 165 C 277.5 165, 292.5 165, 360 165" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.85" marker-end="url(#arr0)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="285" y="155" text-anchor="middle" class="wire-label" fill="#22d3ee">invoke (HTTPS · MCP · A2A)</text><path d="M 115 270 C 115 311.487950057818, 135 318.512049942182, 135 360" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.85" stroke-dasharray="6 5" marker-end="url(#arr1)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="133" y="309" text-anchor="middle" class="wire-label" fill="#fbbf24">authenticate</text><path d="M 250 403.2 C 301.1007446129702 403.2, 308.8992553870298 375, 360 375" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.85" stroke-dasharray="6 5" marker-end="url(#arr1)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="305" y="381.1" text-anchor="middle" class="wire-label" fill="#fbbf24">inbound auth: validate token</text><path d="M 880 186 C 929.5735816741135 186, 940.4264183258865 180, 990 180" fill="none" stroke="#34d399" stroke-width="2" opacity="0.85" marker-end="url(#arr2)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="935" y="175" text-anchor="middle" class="wire-label" fill="#34d399">MCP tool calls</text><path d="M 1230 180 C 1257.0599334810713 180, 1262.9400665189287 184, 1290 184" fill="none" stroke="#34d399" stroke-width="2" opacity="0.85" marker-end="url(#arr2)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="1260" y="174" text-anchor="middle" class="wire-label" fill="#34d399">REST / Lambda / MCP</text><path d="M 250 520.8 L 940 521 L 940 395 L 1050 360" stroke-linejoin="round" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.85" stroke-dasharray="6 5" marker-end="url(#arr1)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="590" y="534" text-anchor="middle" class="wire-label" fill="#fbbf24">outbound auth: OAuth / API keys</text><path d="M 880 417 C 939.4085221159389 417, 930.5914778840611 490, 990 490" fill="none" stroke="#a78bfa" stroke-width="2" opacity="0.85" marker-end="url(#arr3)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="935" y="445.5" text-anchor="middle" class="wire-label" fill="#a78bfa">browse / run code</text><path d="M 516 480 C 516 516, 516 524, 516 560" fill="none" stroke="#e879f9" stroke-width="2" opacity="0.85" marker-end="url(#arr4)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="486" y="513" text-anchor="middle" class="wire-label" fill="#e879f9">CreateEvent (store turns)</text><path d="M 724 560 C 724 524, 724 516, 724 480" fill="none" stroke="#e879f9" stroke-width="2" opacity="0.85" marker-end="url(#arr4)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="738" y="513" text-anchor="middle" class="wire-label" fill="#e879f9">RetrieveMemoryRecords</text><path d="M 605 727 C 618.5 727, 621.5 727, 635 727" fill="none" stroke="#fb7185" stroke-width="1.6" opacity="0.85" marker-end="url(#arr5)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="620" y="721" text-anchor="middle" class="wire-label" fill="#fb7185">async extraction</text><path d="M 135 760 L 135 852 L 955 852 L 955 294 L 990 294" stroke-linejoin="round" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.85" stroke-dasharray="6 5" marker-end="url(#arr1)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="200" y="833" text-anchor="middle" class="wire-label" fill="#fbbf24">permit / deny tool calls (Cedar)</text><path d="M 620 840 C 620 858, 620 862, 620 880" fill="none" stroke="#fb7185" stroke-width="2" opacity="0.85" stroke-dasharray="6 5" marker-end="url(#arr5)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="630" y="860" text-anchor="middle" class="wire-label" fill="#fb7185">OTEL traces &amp; metrics</text><path d="M 880 935 C 929.5 935, 940.5 935, 990 935" fill="none" stroke="#fb7185" stroke-width="2" opacity="0.85" stroke-dasharray="6 5" marker-end="url(#arr5)" filter="drop-shadow(0 0 3px rgba(255,255,255,.15))"></path><text x="935" y="927" text-anchor="middle" class="wire-label" fill="#fb7185">trajectories to score</text></svg>
 
   <!-- ===================== Client ===================== -->
   <div class="block" id="client" data-detail="client" style="--c:var(--blue); left:20px; top:120px; width:190px; height:150px;">
@@ -216,7 +257,7 @@
   <div class="block" id="identity" data-detail="identity" style="--c:var(--amber); left:20px; top:360px; width:230px; height:240px;">
     <span class="hint">i</span>
     <span class="tag">AgentCore Identity</span>
-    <span class="sub">Agent identity, auth & token vault</span>
+    <span class="sub">Agent identity, auth &amp; token vault</span>
     <div class="subbox">
       <div class="sb-title">Inbound Auth</div>
       <ul><li>IAM SigV4 / OAuth JWT</li><li>Okta, Entra ID, Cognito</li></ul>
@@ -231,7 +272,7 @@
   <div class="block container-block" id="runtime" data-detail="runtime" style="--c:var(--cyan); left:360px; top:60px; width:520px; height:420px;">
     <span class="hint">i</span>
     <span class="tag">AgentCore Runtime</span>
-    <span class="sub">Serverless, session-isolated hosting for agents & tools</span>
+    <span class="sub">Serverless, session-isolated hosting for agents &amp; tools</span>
 
     <div class="block" id="microvm" data-detail="microvm" style="--c:var(--cyan); left:14px; top:74px; width:300px; height:328px; position:absolute;">
       <span class="hint">i</span>
@@ -249,7 +290,7 @@
         <div class="sb-title">Isolation</div>
         <ul>
           <li>Dedicated CPU / RAM / filesystem</li>
-          <li>microVM destroyed & memory sanitized at session end</li>
+          <li>microVM destroyed &amp; memory sanitized at session end</li>
         </ul>
       </div>
     </div>
@@ -295,8 +336,8 @@
   <!-- ===================== External tools ===================== -->
   <div class="block" id="external" data-detail="external" style="--c:var(--green); left:1290px; top:80px; width:170px; height:260px;">
     <span class="hint">i</span>
-    <span class="tag" style="font-size:11.5px;">External Tools & APIs</span>
-    <span class="sub">3rd-party & internal services</span>
+    <span class="tag" style="font-size:11.5px;">External Tools &amp; APIs</span>
+    <span class="sub">3rd-party &amp; internal services</span>
     <div class="chiprow">
       <span class="chip">Slack</span><span class="chip">Jira</span><span class="chip">Salesforce</span>
       <span class="chip">GitHub</span><span class="chip">Zoom</span><span class="chip">Internal APIs</span>
@@ -322,7 +363,7 @@
   <div class="block" id="memory" data-detail="memory" style="--c:var(--magenta); left:360px; top:560px; width:520px; height:280px;">
     <span class="hint">i</span>
     <span class="tag">AgentCore Memory</span>
-    <span class="sub">Managed short-term context & long-term knowledge</span>
+    <span class="sub">Managed short-term context &amp; long-term knowledge</span>
 
     <div class="block" id="stm" data-detail="stm" style="--c:var(--magenta); left:14px; top:70px; width:230px; height:192px; position:absolute;">
       <span class="hint">i</span>
@@ -331,7 +372,7 @@
         <div class="sb-title">Raw events</div>
         <ul>
           <li>Conversation history (turn by turn)</li>
-          <li>State & checkpoints</li>
+          <li>State &amp; checkpoints</li>
           <li>Scoped per session / actor</li>
         </ul>
       </div>
@@ -365,7 +406,7 @@
   <div class="block" id="obs" data-detail="obs" style="--c:var(--rose); left:360px; top:880px; width:520px; height:110px;">
     <span class="hint">i</span>
     <span class="tag">AgentCore Observability</span>
-    <span class="sub">End-to-end traces of every LLM call, tool call & memory access</span>
+    <span class="sub">End-to-end traces of every LLM call, tool call &amp; memory access</span>
     <div class="chiprow">
       <span class="chip">OpenTelemetry</span><span class="chip">CloudWatch GenAI dashboards</span>
       <span class="chip">latency · tokens · errors</span><span class="chip">Datadog / Langfuse export</span>
@@ -384,14 +425,235 @@
 
 </div>
 </div>
+</section>
+
+<section class="diagram-view" id="view-agents">
+<div class="wrap">
+<div class="legend">
+  <span><i style="border-color:var(--cyan)"></i> invocation / orchestration</span>
+  <span><i class="dash" style="border-color:var(--amber)"></i> IAM auth</span>
+  <span><i style="border-color:var(--magenta)"></i> knowledge retrieval</span>
+  <span><i class="dash" style="border-color:var(--rose)"></i> guardrails / traces</span>
+  <span><i class="dash" style="border-color:var(--blue)"></i> prompt management</span>
+</div>
+<div id="ba-canvas">
+  <svg id="ba-wires"></svg>
+
+  <!-- Client -->
+  <div class="block" id="ba-client" data-detail="ba-client" style="--c:var(--blue); left:20px; top:120px; width:190px; height:150px;">
+    <span class="hint">i</span>
+    <span class="tag">Client Application</span>
+    <span class="sub">Web app, chatbot, or backend service</span>
+    <div class="chiprow">
+      <span class="chip">InvokeAgent</span><span class="chip">streaming</span><span class="chip">sessionId</span>
+    </div>
+  </div>
+
+  <!-- IAM -->
+  <div class="block" id="ba-iam" data-detail="ba-iam" style="--c:var(--amber); left:20px; top:360px; width:220px; height:150px;">
+    <span class="hint">i</span>
+    <span class="tag">AWS IAM</span>
+    <span class="sub">Authentication &amp; authorization for agent APIs</span>
+    <div class="chiprow">
+      <span class="chip">SigV4</span><span class="chip">IAM policies</span><span class="chip">resource-based</span>
+    </div>
+  </div>
+
+  <!-- Bedrock Agent (container) -->
+  <div class="block container-block" id="ba-agent" data-detail="ba-agent" style="--c:var(--violet); left:360px; top:60px; width:520px; height:420px;">
+    <span class="hint">i</span>
+    <span class="tag">Bedrock Agent</span>
+    <span class="sub">Managed orchestration of FM, tools &amp; knowledge</span>
+
+    <div class="block" id="ba-orchestration" data-detail="ba-orchestration" style="--c:var(--violet); left:14px; top:74px; width:300px; height:328px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11.5px;">Orchestration Engine</span>
+      <span class="sub">ReAct loop: reason → act → observe</span>
+      <div class="subbox">
+        <div class="sb-title">Prompt pipeline</div>
+        <ul>
+          <li>Pre-processing — validate &amp; categorize input</li>
+          <li>Orchestration — choose KB query or action</li>
+          <li>Post-processing — format final response</li>
+        </ul>
+      </div>
+      <div class="subbox">
+        <div class="sb-title">Session state</div>
+        <ul>
+          <li>Conversation history per sessionId</li>
+          <li>Parameter elicitation across turns</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block" id="ba-model" data-detail="ba-model" style="--c:var(--cyan); left:336px; top:74px; width:168px; height:150px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11.5px;">Foundation Model</span>
+      <span class="sub">Bedrock-hosted LLM for reasoning</span>
+      <div class="chiprow">
+        <span class="chip">Claude</span><span class="chip">Nova</span><span class="chip">Llama</span>
+      </div>
+    </div>
+
+    <div class="block" id="ba-alias" data-detail="ba-alias" style="--c:var(--violet); left:336px; top:244px; width:168px; height:158px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11.5px;">Agent Alias</span>
+      <span class="sub">Versioned deployment endpoints</span>
+      <div class="chiprow">
+        <span class="chip">DRAFT</span><span class="chip">TSTALIASID</span><span class="chip">prod</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Groups -->
+  <div class="block" id="ba-actions" data-detail="ba-actions" style="--c:var(--green); left:990px; top:60px; width:240px; height:300px;">
+    <span class="hint">i</span>
+    <span class="tag">Action Groups</span>
+    <span class="sub">Tools the agent can invoke to complete tasks</span>
+    <div class="subbox">
+      <div class="sb-title">Schema</div>
+      <ul>
+        <li>OpenAPI — REST API operations</li>
+        <li>Function detail — parameter elicitation</li>
+      </ul>
+    </div>
+    <div class="subbox">
+      <div class="sb-title">Executor</div>
+      <ul>
+        <li>Lambda function fulfillment</li>
+        <li>returnControl to client app</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Enterprise APIs -->
+  <div class="block" id="ba-apis" data-detail="ba-apis" style="--c:var(--green); left:1290px; top:80px; width:170px; height:260px;">
+    <span class="hint">i</span>
+    <span class="tag" style="font-size:11.5px;">Enterprise APIs</span>
+    <span class="sub">Business systems behind action groups</span>
+    <div class="chiprow">
+      <span class="chip">CRM</span><span class="chip">ERP</span><span class="chip">Booking</span>
+      <span class="chip">Internal REST</span><span class="chip">Athena</span>
+    </div>
+  </div>
+
+  <!-- Knowledge Base -->
+  <div class="block" id="ba-kb" data-detail="ba-kb" style="--c:var(--magenta); left:360px; top:560px; width:520px; height:280px;">
+    <span class="hint">i</span>
+    <span class="tag">Knowledge Base</span>
+    <span class="sub">Managed RAG — retrieve private data to augment responses</span>
+
+    <div class="block" id="ba-retrieval" data-detail="ba-retrieval" style="--c:var(--magenta); left:14px; top:70px; width:230px; height:192px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11px;">Vector Retrieval</span>
+      <div class="subbox">
+        <div class="sb-title">RetrieveAndGenerate</div>
+        <ul>
+          <li>Semantic similarity search</li>
+          <li>Chunk ranking &amp; filtering</li>
+          <li>Context injected into prompts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block" id="ba-datasources" data-detail="ba-datasources" style="--c:var(--rose); left:274px; top:70px; width:230px; height:192px; position:absolute;">
+      <span class="hint">i</span>
+      <span class="tag" style="font-size:11px;">Data Sources</span>
+      <div class="subbox">
+        <div class="sb-title">Ingestion</div>
+        <ul>
+          <li>Amazon S3 documents</li>
+          <li>Web crawler · Confluence · SharePoint</li>
+          <li>Embeddings → vector store</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guardrails -->
+  <div class="block" id="ba-guardrails" data-detail="ba-guardrails" style="--c:var(--rose); left:20px; top:540px; width:220px; height:160px;">
+    <span class="hint">i</span>
+    <span class="tag">Guardrails</span>
+    <span class="sub">Content filters on agent input &amp; output</span>
+    <div class="chiprow">
+      <span class="chip">deny topics</span><span class="chip">PII filter</span><span class="chip">word filters</span>
+    </div>
+  </div>
+
+  <!-- Traces & Logs -->
+  <div class="block" id="ba-traces" data-detail="ba-traces" style="--c:var(--rose); left:360px; top:880px; width:520px; height:110px;">
+    <span class="hint">i</span>
+    <span class="tag">Traces &amp; CloudWatch</span>
+    <span class="sub">Step-by-step reasoning traces and InvokeAgent logs</span>
+    <div class="chiprow">
+      <span class="chip">orchestration trace</span><span class="chip">action traces</span>
+      <span class="chip">KB retrieval trace</span><span class="chip">CloudWatch Logs</span>
+    </div>
+  </div>
+
+  <!-- Prompt Management (Bedrock service) -->
+  <div class="block" id="ba-prompt-mgmt" data-detail="ba-prompt-mgmt" style="--c:var(--blue); left:990px; top:400px; width:240px; height:220px;">
+    <span class="hint">i</span>
+    <span class="tag">Prompt Management</span>
+    <span class="sub">Central catalog to create, version &amp; test reusable prompts</span>
+    <div class="subbox">
+      <div class="sb-title">Capabilities</div>
+      <ul>
+        <li>Prompt variants &amp; side-by-side testing</li>
+        <li>Version history &amp; deployment</li>
+        <li>Variables for runtime substitution</li>
+      </ul>
+    </div>
+    <div class="chiprow">
+      <span class="chip">Converse API</span><span class="chip">Flows</span><span class="chip">agents</span>
+    </div>
+  </div>
+
+  <!-- Advanced prompt overrides (agent-internal) -->
+  <div class="block" id="ba-prompts" data-detail="ba-prompts" style="--c:var(--cyan); left:990px; top:870px; width:240px; height:130px;">
+    <span class="hint">i</span>
+    <span class="tag">Advanced Prompt Overrides</span>
+    <span class="sub">Per-step orchestration prompt templates on the agent</span>
+    <div class="chiprow">
+      <span class="chip">pre-process</span><span class="chip">orchestration</span><span class="chip">KB response</span>
+    </div>
+  </div>
+
+</div>
+</div>
+</section>
 
 <!-- popup -->
-<div id="overlay"></div>
-<div id="popup">
+<div id="overlay" style="display: none;"></div>
+<div id="popup" style="--pc: var(--rose); display: none; left: 971px; top: 368px;">
   <button id="closeBtn" title="Close">✕</button>
-  <h2 id="popupTitle"></h2>
-  <p class="lead" id="popupLead"></p>
-  <div id="popupBody"></div>
+  <h2 id="popupTitle">Long-Term Memory</h2>
+  <p class="lead" id="popupLead">Structured insights extracted from conversations and persisted across sessions.</p>
+  <div id="popupBody">
+      <h3>Strategy — what to remember</h3>
+      <ul>
+        <li><b>Semantic</b>: facts and knowledge from conversations.</li>
+        <li><b>User preference</b>: likes, dislikes, settings ("prefers window seat").</li>
+        <li><b>Summary</b>: per-session conversation summaries.</li>
+        <li><b>Episodic</b>: reasoning over past episodes (with reflection).</li>
+        <li><b>Custom / override</b>: bring your own extraction &amp; consolidation prompts and model.</li>
+      </ul>
+      <h3>Extraction</h3>
+      <ul>
+        <li>Asynchronous, LLM-driven; triggered automatically after events land in short-term memory.</li>
+        <li>Produces structured memory records in the strategy's schema.</li>
+      </ul>
+      <h3>Consolidation</h3>
+      <ul>
+        <li>Retrieves semantically similar existing records, then the LLM decides:
+          <ul>
+            <li><b>ADD</b> — information is genuinely new</li>
+            <li><b>UPDATE</b> — complements or supersedes an existing record (recent info wins)</li>
+            <li><b>SKIP / NO-OP</b> — redundant ("loves pizza" ≈ "likes pizza")</li>
+          </ul>
+        </li>
+        <li>Resolves contradictions and minimizes duplicates so memory stays clean.</li>
+      </ul></div>
 </div>
 
 <script>
@@ -664,6 +926,269 @@ const DETAILS = {
         <li>Works on trajectories captured by Observability.</li>
         <li>Surfaces regressions so you can fix prompts, tools or strategies before users notice.</li>
       </ul>`
+  },
+
+  /* ===== Bedrock Agents ===== */
+  "ba-client": {
+    color:"var(--blue)", title:"Client Application",
+    lead:"Your application that invokes the Bedrock Agent on behalf of end users.",
+    body:`
+      <h3>Invocation</h3>
+      <ul>
+        <li>Calls the <b>InvokeAgent</b> API (or <b>InvokeAgentWithResponseStream</b> for streaming) with an <b>agentId</b>, <b>agentAliasId</b>, and <b>sessionId</b>.</li>
+        <li>The <b>sessionId</b> ties multi-turn conversations together — the agent retains context within the session.</li>
+        <li>Supports text input; can receive <b>returnControl</b> events when the agent needs the client to fulfill an action.</li>
+      </ul>
+      <h3>Integration patterns</h3>
+      <ul>
+        <li>Direct SDK calls from a web/mobile backend.</li>
+        <li>API Gateway + Lambda proxy in front of InvokeAgent.</li>
+        <li>Amazon Lex or custom chat UIs as the front end.</li>
+      </ul>`
+  },
+  "ba-iam": {
+    color:"var(--amber)", title:"AWS IAM",
+    lead:"Controls who can create, configure, and invoke Bedrock Agents.",
+    body:`
+      <h3>Authentication</h3>
+      <ul>
+        <li>All Bedrock Agent API calls use <b>AWS Signature Version 4 (SigV4)</b>.</li>
+        <li>Callers authenticate with IAM users, roles, or federated credentials.</li>
+      </ul>
+      <h3>Authorization</h3>
+      <ul>
+        <li><b>Identity-based policies</b> grant <code>bedrock:InvokeAgent</code>, <code>bedrock:GetAgent</code>, etc.</li>
+        <li><b>Resource-based policies</b> on agents can allow cross-account access.</li>
+        <li>Separate permissions needed for associated Lambda functions, knowledge bases, and guardrails.</li>
+      </ul>`
+  },
+  "ba-agent": {
+    color:"var(--violet)", title:"Bedrock Agent",
+    lead:"A fully managed autonomous agent that orchestrates foundation models, action groups, and knowledge bases to complete user tasks.",
+    body:`
+      <h3>What you configure</h3>
+      <ul>
+        <li><b>Instructions</b>: system prompt defining the agent's role, tone, and constraints.</li>
+        <li><b>Foundation model</b>: the Bedrock LLM used for all reasoning steps.</li>
+        <li><b>Action groups</b>: APIs/tools the agent can call (optional).</li>
+        <li><b>Knowledge bases</b>: private data for RAG augmentation (optional).</li>
+        <li><b>Guardrails</b>: content safety filters on input and output (optional).</li>
+        <li><b>Prompt Management</b>: reusable, versioned prompts from the Bedrock prompt catalog (optional).</li>
+      </ul>
+      <h3>Lifecycle</h3>
+      <ul>
+        <li>Create and iterate in <b>DRAFT</b> version; prepare and create <b>aliases</b> for production deployment.</li>
+        <li>Each alias pins a prepared agent version for safe rollout.</li>
+      </ul>`
+  },
+  "ba-orchestration": {
+    color:"var(--violet)", title:"Orchestration Engine",
+    lead:"The core ReAct loop that drives the agent: interpret input, decide actions, observe results, repeat until done.",
+    body:`
+      <h3>Prompt pipeline</h3>
+      <ul>
+        <li><b>Pre-processing</b>: validates and categorizes user input; can reject off-topic requests early.</li>
+        <li><b>Orchestration</b>: the FM receives the orchestration prompt with conversation history, instructions, action schemas, and KB context. It returns either a final answer or a request to invoke an action / query a knowledge base.</li>
+        <li><b>Post-processing</b>: formats and polishes the final response before returning to the user.</li>
+      </ul>
+      <h3>ReAct loop</h3>
+      <ul>
+        <li>Each orchestration step produces an <b>observation</b> (action result or KB retrieval).</li>
+        <li>The loop continues until the model returns a <b>finish</b> observation with the final response.</li>
+        <li>Every step is captured in <b>traces</b> for debugging.</li>
+      </ul>
+      <h3>Session state</h3>
+      <ul>
+        <li>Conversation history and partially elicited parameters persist across turns within a <b>sessionId</b>.</li>
+      </ul>`
+  },
+  "ba-model": {
+    color:"var(--cyan)", title:"Foundation Model",
+    lead:"The Bedrock-hosted LLM that powers every reasoning step in the agent's orchestration loop.",
+    body:`
+      <h3>Supported models</h3>
+      <ul>
+        <li>Anthropic Claude, Amazon Nova, Meta Llama, Mistral, and other Bedrock text models that support agents.</li>
+      </ul>
+      <h3>Role in orchestration</h3>
+      <ul>
+        <li>Receives synthesized prompts: instructions + history + action group schemas + KB context.</li>
+        <li>Decides whether to respond directly, query a knowledge base, or invoke an action group.</li>
+        <li>Parses structured output to extract API parameters for action invocation.</li>
+      </ul>`
+  },
+  "ba-alias": {
+    color:"var(--violet)", title:"Agent Alias",
+    lead:"Named, versioned endpoints used to invoke a prepared agent in production.",
+    body:`
+      <h3>Versions & aliases</h3>
+      <ul>
+        <li><b>DRAFT</b>: the working version you edit and test (TSTALIASID for testing).</li>
+        <li><b>Prepared versions</b>: immutable snapshots created when you prepare the agent.</li>
+        <li><b>Aliases</b> (e.g. prod, staging) point to a specific prepared version.</li>
+      </ul>
+      <h3>Why aliases matter</h3>
+      <ul>
+        <li>Clients call a stable <b>agentAliasId</b> while you roll out new versions behind the alias.</li>
+        <li>Enables blue/green deployment without changing client code.</li>
+      </ul>`
+  },
+  "ba-actions": {
+    color:"var(--green)", title:"Action Groups",
+    lead:"Define the tasks your agent can perform by mapping API operations to business logic.",
+    body:`
+      <h3>Schema definition</h3>
+      <ul>
+        <li><b>OpenAPI schema</b>: describes REST API operations and parameters the agent must elicit from the user.</li>
+        <li><b>Function detail schema</b>: defines parameters without tying to a specific API — useful for custom fulfillment.</li>
+      </ul>
+      <h3>Fulfillment</h3>
+      <ul>
+        <li><b>Lambda executor</b>: receives parsed parameters from the agent, calls your business APIs, returns the result as an observation.</li>
+        <li><b>returnControl</b>: instead of Lambda, the agent returns control to your client app to fulfill the action (e.g. payment UI).</li>
+      </ul>
+      <h3>Examples</h3>
+      <ul>
+        <li>BookHotel: CreateBooking, GetBooking, CancelBooking.</li>
+        <li>CRM lookup, ticket creation, SQL query via Athena.</li>
+      </ul>`
+  },
+  "ba-apis": {
+    color:"var(--green)", title:"Enterprise APIs",
+    lead:"The real business systems your action group Lambda functions call on behalf of the agent.",
+    body:`
+      <h3>What gets invoked</h3>
+      <ul>
+        <li>Internal REST microservices, SaaS APIs (CRM, ERP), databases via Athena/Glue.</li>
+        <li>Any endpoint your Lambda executor can reach within your VPC or over the internet.</li>
+      </ul>
+      <h3>Access pattern</h3>
+      <ul>
+        <li>Agent orchestration → Action group → Lambda executor → Enterprise API → result returned as observation → next orchestration step.</li>
+      </ul>`
+  },
+  "ba-kb": {
+    color:"var(--magenta)", title:"Knowledge Base",
+    lead:"Fully managed RAG that lets the agent query your private documents and data to ground its responses.",
+    body:`
+      <h3>How the agent uses it</h3>
+      <ul>
+        <li>During orchestration, the agent can decide to <b>query the knowledge base</b> for relevant context.</li>
+        <li>Retrieved chunks are injected into the orchestration or KB-response-generation prompt.</li>
+        <li>Improves accuracy for domain-specific questions without fine-tuning the model.</li>
+      </ul>
+      <h3>Setup</h3>
+      <ul>
+        <li>Associate one or more knowledge bases with the agent in the console or API.</li>
+        <li>Configure retrieval settings: number of results, search type (semantic / hybrid).</li>
+      </ul>`
+  },
+  "ba-retrieval": {
+    color:"var(--magenta)", title:"Vector Retrieval",
+    lead:"Semantic search over embedded document chunks at query time.",
+    body:`
+      <h3>RetrieveAndGenerate</h3>
+      <ul>
+        <li>User query (or agent sub-query) is embedded and matched against the vector index.</li>
+        <li>Top-ranked chunks are returned with metadata and relevance scores.</li>
+        <li>Chunks augment the FM prompt for grounded response generation.</li>
+      </ul>
+      <h3>Vector stores</h3>
+      <ul>
+        <li>Amazon OpenSearch Serverless, Aurora PostgreSQL (pgvector), Pinecone, Redis Enterprise Cloud, and more.</li>
+      </ul>`
+  },
+  "ba-datasources": {
+    color:"var(--rose)", title:"Data Sources",
+    lead:"Where your private knowledge comes from and how it gets embedded into the vector store.",
+    body:`
+      <h3>Supported sources</h3>
+      <ul>
+        <li><b>Amazon S3</b>: PDFs, docs, HTML, markdown, and more.</li>
+        <li><b>Web crawler</b>: ingest public web pages on a schedule.</li>
+        <li><b>Connectors</b>: Confluence, SharePoint, Salesforce, and other enterprise sources.</li>
+      </ul>
+      <h3>Ingestion pipeline</h3>
+      <ul>
+        <li>Documents are chunked, embedded with a Bedrock embedding model, and indexed in the vector store.</li>
+        <li>Sync jobs keep the index up to date as source data changes.</li>
+      </ul>`
+  },
+  "ba-guardrails": {
+    color:"var(--rose)", title:"Guardrails",
+    lead:"Content safety filters applied to agent input and output to block harmful or off-topic content.",
+    body:`
+      <h3>Capabilities</h3>
+      <ul>
+        <li><b>Denied topics</b>: block responses on configured subject areas.</li>
+        <li><b>Content filters</b>: hate, insults, sexual, violence, misconduct thresholds.</li>
+        <li><b>PII filters</b>: detect and block/redact sensitive personal information.</li>
+        <li><b>Word filters</b>: custom blocked and profanity word lists.</li>
+      </ul>
+      <h3>When applied</h3>
+      <ul>
+        <li>Guardrails associated with the agent evaluate both user input (pre-processing) and agent output (post-processing).</li>
+        <li>Violations can block the request or mask sensitive content before it reaches the user.</li>
+      </ul>`
+  },
+  "ba-traces": {
+    color:"var(--rose)", title:"Traces & CloudWatch",
+    lead:"Step-by-step visibility into the agent's reasoning and orchestration process.",
+    body:`
+      <h3>Trace types</h3>
+      <ul>
+        <li><b>Pre-processing trace</b>: how input was classified.</li>
+        <li><b>Orchestration trace</b>: FM rationale, chosen action or KB query, parsed parameters.</li>
+        <li><b>Action group trace</b>: Lambda invocation input/output.</li>
+        <li><b>Knowledge base trace</b>: retrieval query, returned chunks, scores.</li>
+        <li><b>Post-processing trace</b>: final response formatting.</li>
+      </ul>
+      <h3>Where to view</h3>
+      <ul>
+        <li>Returned inline in <b>InvokeAgent</b> responses (enable trace).</li>
+        <li><b>CloudWatch Logs</b> for production monitoring and alerting.</li>
+      </ul>`
+  },
+  "ba-prompt-mgmt": {
+    color:"var(--blue)", title:"Prompt Management",
+    lead:"A centralized Bedrock service to create, version, test, and deploy reusable prompts across applications and agents.",
+    body:`
+      <h3>What it provides</h3>
+      <ul>
+        <li><b>Prompt catalog</b>: store prompts with system instructions, messages, variables, and tool definitions.</li>
+        <li><b>Variants</b>: create multiple variants and compare outputs side-by-side to pick the best one.</li>
+        <li><b>Versioning</b>: save versions as you iterate; deploy a specific version to production.</li>
+        <li><b>Variables</b>: placeholders (e.g. <code>{{customer_name}}</code>) filled at test or runtime.</li>
+      </ul>
+      <h3>Integration with agents</h3>
+      <ul>
+        <li>In the <b>console</b>, you can associate a prompt with a Bedrock Agent and test them together.</li>
+        <li>Prompts can be stored and reused for agent instructions and workflows.</li>
+        <li>Via <b>API</b>, there is no direct "invoke agent with prompt ARN" — you typically retrieve the prompt text, substitute variables, and pass it as <code>inputText</code> to <b>InvokeAgent</b>, or use prompts with the <b>Converse</b> / <b>InvokeModel</b> APIs and <b>Bedrock Flows</b>.</li>
+      </ul>
+      <h3>Related features</h3>
+      <ul>
+        <li><b>Prompt optimization</b> (preview): AWS can suggest improved prompt text.</li>
+        <li>Distinct from <b>Advanced Prompt Overrides</b> on the agent itself (per-orchestration-step templates).</li>
+      </ul>`
+  },
+  "ba-prompts": {
+    color:"var(--cyan)", title:"Advanced Prompt Overrides",
+    lead:"Agent-internal prompt templates that override the default text for each orchestration step (promptOverrideConfiguration).",
+    body:`
+      <h3>Template types</h3>
+      <ul>
+        <li><b>Pre-processing</b>: classify and validate user input before orchestration.</li>
+        <li><b>Orchestration</b>: the main ReAct prompt — instructions, history, tools, KB context.</li>
+        <li><b>Knowledge base response generation</b>: how retrieved chunks are used to answer.</li>
+        <li><b>Post-processing</b>: polish and format the final user-facing response.</li>
+      </ul>
+      <h3>How it differs from Prompt Management</h3>
+      <ul>
+        <li><b>Prompt Management</b> is a shared Bedrock catalog for reusable prompts across apps, models, Flows, and agents.</li>
+        <li><b>Advanced Prompt Overrides</b> are configured directly on the agent via <code>promptOverrideConfiguration</code> — they control the built-in orchestration pipeline templates.</li>
+        <li>You can combine both: craft prompts in Prompt Management, then apply similar text as agent instructions or overrides.</li>
+      </ul>`
   }
 };
 
@@ -706,11 +1231,7 @@ document.querySelectorAll("[data-detail]").forEach(el=>{
 });
 
 /* ============ wires (arrows with labels) ============ */
-const canvas = document.getElementById("canvas");
-const svg = document.getElementById("wires");
-
-// side: t/b/l/r ; frac: position along that side (0..1)
-const WIRES = [
+const WIRES_AGENTCORE = [
   {from:"client", fs:"r", ff:.3,  to:"runtime",  ts:"l", tf:.25, color:"var(--cyan)",  label:"invoke (HTTPS · MCP · A2A)", labelDy:-10},
   {from:"client", fs:"b", ff:.5,  to:"identity", ts:"t", tf:.5,  color:"var(--amber)", label:"authenticate", dash:true, labelDx:8},
   {from:"identity",fs:"r", ff:.18, to:"runtime",  ts:"l", tf:.75, color:"var(--amber)", label:"inbound auth: validate token", dash:true, labelDy:-8},
@@ -728,7 +1249,24 @@ const WIRES = [
   {from:"obs",     fs:"r", ff:.5,  to:"evals",    ts:"l", tf:.5,  color:"var(--rose)",  label:"trajectories to score", dash:true, labelDy:-8},
 ];
 
-function anchor(el, side, frac){
+const WIRES_AGENTS = [
+  {from:"ba-client", fs:"r", ff:.3,  to:"ba-agent",       ts:"l", tf:.25, color:"var(--cyan)",   label:"InvokeAgent", labelDy:-10},
+  {from:"ba-client", fs:"b", ff:.5,  to:"ba-iam",         ts:"t", tf:.5,  color:"var(--amber)",  label:"SigV4 authenticate", dash:true, labelDx:8},
+  {from:"ba-iam",    fs:"r", ff:.35, to:"ba-agent",       ts:"l", tf:.75, color:"var(--amber)",  label:"authorize caller", dash:true, labelDy:-8},
+  {from:"ba-orchestration", fs:"r", ff:.2, to:"ba-model", ts:"l", tf:.5,  color:"var(--cyan)",   label:"reason & parse actions", labelDy:-8, inner:true},
+  {from:"ba-agent",  fs:"r", ff:.3,  to:"ba-actions",    ts:"l", tf:.4,  color:"var(--green)",  label:"invoke action group", labelDy:-8},
+  {from:"ba-actions",fs:"r", ff:.4,  to:"ba-apis",       ts:"l", tf:.4,  color:"var(--green)",  label:"Lambda → API call", labelDy:-8},
+  {from:"ba-agent",  fs:"b", ff:.3,  to:"ba-kb",         ts:"t", tf:.3,  color:"var(--magenta)",label:"query knowledge base", labelDx:-20, labelDy:-7},
+  {from:"ba-kb",     fs:"t", ff:.7,  to:"ba-agent",      ts:"b", tf:.7,  color:"var(--magenta)",label:"retrieved chunks", labelDx:14, labelDy:-7},
+  {from:"ba-retrieval", fs:"r", ff:.5, to:"ba-datasources", ts:"l", tf:.5, color:"var(--rose)", label:"embed & index", labelDy:-6, inner:true},
+  {from:"ba-guardrails", fs:"r", ff:.5, to:"ba-agent",    ts:"l", tf:.55, color:"var(--rose)",   label:"filter input / output", dash:true, labelDy:-8},
+  {from:"ba-prompt-mgmt", fs:"l", ff:.35, to:"ba-agent",  ts:"r", tf:.55, color:"var(--blue)",   label:"instructions & prompt versions", dash:true, labelDy:-8},
+  {from:"ba-agent",  fs:"b", ff:.5,  to:"ba-traces",     ts:"t", tf:.5,  color:"var(--rose)",   label:"orchestration traces", dash:true, labelDx:10, labelDy:0},
+  {from:"ba-prompts",fs:"l", ff:.5,  to:"ba-orchestration", ts:"r", tf:.35, color:"var(--cyan)", label:"per-step overrides", dash:true,
+   via:[{x:910,y:935},{x:910,y:280},{x:674,y:280}], labelAt:{x:820,y:600}},
+];
+
+function anchorInCanvas(canvas, el, side, frac){
   const c = canvas.getBoundingClientRect();
   const r = el.getBoundingClientRect();
   const x = r.left - c.left, y = r.top - c.top, w = r.width, h = r.height;
@@ -740,19 +1278,22 @@ function anchor(el, side, frac){
   }
 }
 
-function drawWires(){
+function drawWires(canvasId, svgId, wires){
+  const canvas = document.getElementById(canvasId);
+  const svg = document.getElementById(svgId);
+  if(!canvas || !svg) return;
   svg.innerHTML = "";
   const defs = document.createElementNS("http://www.w3.org/2000/svg","defs");
   svg.appendChild(defs);
   const colors = {};
   let mid = 0;
 
-  WIRES.forEach(w=>{
+  wires.forEach(w=>{
     const fromEl = document.getElementById(w.from);
     const toEl   = document.getElementById(w.to);
     if(!fromEl || !toEl) return;
-    const a = anchor(fromEl, w.fs, w.ff);
-    const b = anchor(toEl,   w.ts, w.tf);
+    const a = anchorInCanvas(canvas, fromEl, w.fs, w.ff);
+    const b = anchorInCanvas(canvas, toEl,   w.ts, w.tf);
 
     // arrowhead marker per color
     const col = w.color;
@@ -814,8 +1355,46 @@ function drawWires(){
   });
 }
 
-drawWires();
-window.addEventListener("resize", drawWires);
+const TAB_META = {
+  agentcore: {
+    title: "Amazon Bedrock AgentCore",
+    subtitle: "Modular services for deploying & operating AI agents at scale — click any component for details"
+  },
+  agents: {
+    title: "Amazon Bedrock Agents",
+    subtitle: "Fully managed autonomous agents — orchestrate FMs, action groups & knowledge bases — click any component for details"
+  }
+};
+
+let activeTab = "agentcore";
+
+function switchTab(tab){
+  activeTab = tab;
+  document.querySelectorAll(".tab-btn").forEach(btn=>{
+    btn.classList.toggle("active", btn.dataset.tab === tab);
+  });
+  document.querySelectorAll(".diagram-view").forEach(view=>{
+    view.classList.toggle("active", view.id === "view-" + tab);
+  });
+  const meta = TAB_META[tab];
+  document.getElementById("mainTitle").textContent = meta.title;
+  document.getElementById("mainSubtitle").innerHTML = meta.subtitle.replace("click any component", "<b>click any component</b>");
+  closePopup();
+  if(tab === "agentcore") drawWires("canvas", "wires", WIRES_AGENTCORE);
+  else drawWires("ba-canvas", "ba-wires", WIRES_AGENTS);
+}
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=> switchTab(btn.dataset.tab));
+});
+
+drawWires("canvas", "wires", WIRES_AGENTCORE);
+drawWires("ba-canvas", "ba-wires", WIRES_AGENTS);
+window.addEventListener("resize", ()=>{
+  if(activeTab === "agentcore") drawWires("canvas", "wires", WIRES_AGENTCORE);
+  else drawWires("ba-canvas", "ba-wires", WIRES_AGENTS);
+});
 </script>
-</body>
-</html>
+
+
+</body></html>
