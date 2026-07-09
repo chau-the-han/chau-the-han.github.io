@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Staff Assistant — How It Works &amp; Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #f7f9fc;
+    --surface: #ffffff;
+    --ink: #0f172a;
+    --muted: #5b6b82;
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --teal: #0d9488;
+    --teal-soft: #ccfbf1;
+    --amber: #d97706;
+    --amber-soft: #fef3c7;
+    --rose: #e11d48;
+    --rose-soft: #ffe4e6;
+    --violet: #7c3aed;
+    --violet-soft: #ede9fe;
+    --border: #e2e8f0;
+    --shadow: 0 10px 30px rgba(15, 23, 42, .08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: "Inter", -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 56px 90px 80px 320px;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity .45s ease, transform .45s ease, visibility .45s;
+    pointer-events: none;
+  }
+  .slide.active { visibility: visible; opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+  .slide-inner { width: 100%; max-width: 1240px; }
+
+  /* ---------- Typography ---------- */
+  .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 14px; border-radius: 999px; margin-bottom: 18px;
+  }
+  .kicker.teal  { color: var(--teal);  background: var(--teal-soft); }
+  .kicker.amber { color: var(--amber); background: var(--amber-soft); }
+  .kicker.rose  { color: var(--rose);  background: var(--rose-soft); }
+  h1 { font-size: 54px; font-weight: 800; line-height: 1.12; letter-spacing: -.02em; }
+  h2 { font-size: 38px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 8px; }
+  .subtitle { font-size: 19px; color: var(--muted); margin-top: 14px; line-height: 1.55; max-width: 760px; }
+  .lead { font-size: 17px; color: var(--muted); margin-bottom: 28px; }
+
+  /* ---------- Cards ---------- */
+  .grid { display: grid; gap: 20px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; box-shadow: var(--shadow);
+  }
+  .card h3 { font-size: 17px; font-weight: 700; margin: 14px 0 6px; }
+  .card p { font-size: 14.5px; color: var(--muted); line-height: 1.55; }
+  .icon-badge {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .icon-badge.teal   { background: var(--teal-soft);   color: var(--teal); }
+  .icon-badge.amber  { background: var(--amber-soft);  color: var(--amber); }
+  .icon-badge.rose   { background: var(--rose-soft);   color: var(--rose); }
+  .icon-badge.violet { background: var(--violet-soft); color: var(--violet); }
+  .icon-badge svg { width: 24px; height: 24px; }
+
+  /* ---------- Pills / badges row ---------- */
+  .pill-row { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 26px; justify-content: center; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; padding: 10px 18px;
+    font-size: 14px; font-weight: 600; box-shadow: var(--shadow);
+  }
+  .pill svg { width: 18px; height: 18px; }
+  .pill .dot-ok { color: var(--teal); }
+
+  /* ---------- Mermaid ---------- */
+  .diagram {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 26px 20px; box-shadow: var(--shadow);
+    display: flex; justify-content: center;
+  }
+  .mermaid { display: flex; justify-content: center; width: 100%; }
+  .mermaid svg { max-width: 100%; height: auto; }
+
+  /* ---------- Section divider ---------- */
+  .divider-num {
+    font-size: 130px; font-weight: 800; line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--violet));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 10px;
+  }
+  .divider-sub { font-size: 20px; color: var(--muted); margin-top: 16px; max-width: 640px; line-height: 1.6; }
+
+  /* ---------- Agenda ---------- */
+  .agenda-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 8px;
+    max-width: 900px;
+  }
+  .agenda-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 220px;
+  }
+  .agenda-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .agenda-num {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .agenda-card h3 {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+  .agenda-card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .agenda-topics {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .agenda-topics li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.45;
+  }
+  .agenda-topics li svg {
+    width: 15px;
+    height: 15px;
+    color: var(--teal);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ---------- Layers (defense-in-depth) ---------- */
+  .layers { display: flex; flex-direction: column; gap: 10px; }
+  .layer {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 5px solid var(--teal);
+    border-radius: 12px; padding: 13px 20px; box-shadow: var(--shadow);
+  }
+  .layer:nth-child(even) { border-left-color: var(--accent); }
+  .layer .l-num {
+    font-weight: 800; font-size: 13px; color: var(--muted);
+    min-width: 26px; text-align: center;
+  }
+  .layer .l-title { font-weight: 700; font-size: 15.5px; min-width: 260px; }
+  .layer .l-desc { font-size: 13.5px; color: var(--muted); flex: 1; }
+  .layer .l-example {
+    display: block;
+    margin-top: 5px;
+    font-size: 11.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: #64748b;
+    line-height: 1.45;
+  }
+  .sec-analogy {
+    background: linear-gradient(180deg, #ecfdf8 0%, #fff 100%);
+    border: 1px solid #99f6e4;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  .sec-analogy h4 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f766e;
+    margin-bottom: 8px;
+  }
+  .sec-analogy p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .sec-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sec-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .sec-step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: #e8f0ff;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .sec-step strong {
+    display: block;
+    font-size: 13.5px;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .sec-step span {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .sec-ex-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .sec-ex-card {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sec-ex-card.blocked { border-color: #fecdd3; background: #fffafb; }
+  .sec-ex-card.allowed { border-color: #99f6e4; background: #f7fffd; }
+  .sec-ex-card h5 {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .sec-ex-card.blocked h5 { color: #be123c; }
+  .sec-ex-card.allowed h5 { color: #0f766e; }
+  .sec-ex-card .staff-q {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .sec-ex-card .demo-code { margin-top: 0; font-size: 10.5px; }
+  .sec-ex-verdict {
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 7px 10px;
+    border-radius: 8px;
+    line-height: 1.4;
+  }
+  .sec-ex-card.blocked .sec-ex-verdict { background: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3; }
+  .sec-ex-card.allowed .sec-ex-verdict { background: #d1fae5; color: #065f46; border: 1px solid #99f6e4; }
+
+  /* ---------- Verdict / QA slide ---------- */
+  .verdict {
+    display: flex; align-items: center; gap: 22px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 26px 30px; box-shadow: var(--shadow);
+  }
+  .verdict .big-icon {
+    width: 64px; height: 64px; border-radius: 18px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .verdict .big-icon svg { width: 34px; height: 34px; }
+  .verdict h3 { font-size: 21px; font-weight: 800; margin-bottom: 6px; }
+  .verdict p { font-size: 15px; color: var(--muted); line-height: 1.55; }
+  .v-ok  .big-icon { background: var(--teal-soft); color: var(--teal); }
+  .v-warn .big-icon { background: var(--amber-soft); color: var(--amber); }
+
+  /* ---------- Chat mock ---------- */
+  .chat-mock { display: flex; flex-direction: column; gap: 12px; }
+  .chat-window {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: #f8fafc;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .chat-window-head {
+    padding: 10px 14px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chat-window .chat-mock { padding: 14px; }
+  .bubble {
+    max-width: 82%; padding: 13px 18px; border-radius: 16px;
+    font-size: 14.5px; line-height: 1.5; box-shadow: var(--shadow);
+  }
+  .bubble.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+  .bubble.bot  { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .bubble .b-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .65; margin-bottom: 4px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .chip {
+    font-size: 12.5px; font-weight: 600; color: var(--accent);
+    background: var(--accent-soft); border-radius: 999px; padding: 5px 12px;
+  }
+
+  /* ---------- Roadmap table ---------- */
+  .roadmap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .track { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+  .track-head { padding: 16px 20px; font-weight: 800; font-size: 16px; color: #fff; display: flex; align-items: center; gap: 10px; }
+  .track-head svg { width: 20px; height: 20px; }
+  .track-head.t-blue { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+  .track-head.t-violet { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+  .track-head.t-teal { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+  .track ul { list-style: none; padding: 16px 20px; display: flex; flex-direction: column; gap: 11px; }
+  .track li { font-size: 14px; color: var(--ink); display: flex; gap: 9px; align-items: flex-start; line-height: 1.45; }
+  .track li svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 2.5px; color: var(--teal); }
+
+  /* ---------- Navigation ---------- */
+  .nav {
+    position: fixed; bottom: 22px; right: 26px; z-index: 50;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav button {
+    width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--surface); cursor: pointer; color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow); transition: transform .15s;
+  }
+  .nav button:hover { transform: translateY(-2px); }
+  .nav button svg { width: 18px; height: 18px; }
+  .counter {
+    position: fixed; bottom: 30px; left: 30px; z-index: 50;
+    font-size: 13px; font-weight: 600; color: var(--muted);
+  }
+  .progress {
+    position: fixed; top: 0; left: 0; height: 4px; z-index: 60;
+    background: linear-gradient(90deg, var(--accent), var(--violet));
+    transition: width .35s ease;
+  }
+  .slide-sidebar {
+    position: fixed;
+    top: 22px;
+    left: 18px;
+    bottom: 22px;
+    width: 250px;
+    padding: 20px 10px 20px 20px;
+    background: rgba(255, 255, 255, .86);
+    border: 1px solid rgba(15, 23, 42, .06);
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: blur(4px);
+    z-index: 55;
+    overflow: auto;
+  }
+  .slide-sidebar::before {
+    content: "";
+    position: absolute;
+    top: 22px;
+    bottom: 22px;
+    left: 14px;
+    width: 1px;
+    background: #e5e7eb;
+  }
+  .slide-sidebar-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #737373;
+    margin: 0 0 12px 12px;
+  }
+  .slide-sidebar-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-left: 12px;
+  }
+  .slide-sidebar-link {
+    width: 100%;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    padding: 4px 7px;
+    display: block;
+    text-align: left;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #2f2f2f;
+    cursor: pointer;
+    transition: color .2s ease, background .2s ease;
+  }
+  .slide-sidebar-link .txt {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 650;
+    letter-spacing: -.01em;
+  }
+  .slide-sidebar-link.section {
+    margin-top: 11px;
+  }
+  .slide-sidebar-link.sub {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 12px;
+    color: #6b7280;
+    padding-left: 11px;
+  }
+  .slide-sidebar-link.sub .num {
+    flex-shrink: 0;
+    min-width: 18px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .slide-sidebar-link.sub .txt {
+    font-weight: 500;
+    min-width: 0;
+  }
+  .slide-sidebar-link:hover {
+    color: #111827;
+    background: rgba(15, 23, 42, .03);
+  }
+  .slide-sidebar-link.active {
+    background: transparent;
+    color: #0f766e;
+    font-weight: 700;
+  }
+  .slide-sidebar-link.sub.active {
+    background: #f3f4f6;
+    color: #1f2937;
+  }
+  .slide-sidebar-link.sub.active .num {
+    color: #0f766e;
+  }
+  .slide-sidebar-link.sub-nested {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    font-size: 11px;
+    color: #9ca3af;
+    padding-left: 28px;
+  }
+  .slide-sidebar-link.sub-nested .num {
+    flex-shrink: 0;
+    min-width: 28px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #c4c9d2;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .slide-sidebar-link.sub-nested .txt {
+    font-weight: 400;
+    min-width: 0;
+  }
+  .slide-sidebar-link.sub-nested.active {
+    background: #f9fafb;
+    color: #374151;
+  }
+  .slide-sidebar-link.sub-nested.active .num {
+    color: #0f766e;
+  }
+
+  .center { text-align: center; }
+  .mt-lg { margin-top: 30px; }
+  .note {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--amber-soft); color: #92400e;
+    border-radius: 12px; padding: 11px 18px;
+    font-size: 14px; font-weight: 600; margin-top: 24px;
+  }
+  .note svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .cols { display: grid; grid-template-columns: 1.15fr .85fr; gap: 28px; align-items: center; }
+  .cols-panels { align-items: stretch; }
+  .split-panel {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    min-height: 100%;
+  }
+  .split-panel-head {
+    padding: 14px 18px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .split-panel-head.flow { background: linear-gradient(135deg, #6366f1, #7c3aed); }
+  .split-panel-head.practice { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+  .split-panel-badge {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, .18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .split-panel-title { font-size: 15px; font-weight: 800; line-height: 1.2; }
+  .split-panel-sub { font-size: 12px; opacity: .9; margin-top: 2px; font-weight: 500; }
+  .split-panel-body { padding: 16px; flex: 1; }
+  .split-panel-body .diagram {
+    border: none;
+    box-shadow: none;
+    padding: 8px 4px;
+    background: transparent;
+  }
+  .split-panel-body .chat-window { box-shadow: none; }
+
+  .diagram-hint {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .diagram-hint b { color: var(--accent); }
+  .clickable-briefing,
+  .clickable-node { cursor: pointer; }
+  .clickable-node rect,
+  .clickable-node polygon {
+    stroke-dasharray: 7 4 !important;
+    filter: drop-shadow(0 2px 8px rgba(13, 148, 136, .22));
+    transition: stroke .15s ease, stroke-width .15s ease, filter .15s ease;
+  }
+  .clickable-briefing:hover rect,
+  .clickable-briefing:hover polygon,
+  .clickable-node:hover rect,
+  .clickable-node:hover polygon {
+    stroke: var(--accent) !important;
+    stroke-width: 3px !important;
+    stroke-dasharray: none !important;
+    filter: drop-shadow(0 4px 14px rgba(37, 99, 235, .28));
+  }
+  .clickable-edge {
+    cursor: pointer;
+  }
+  .clickable-edge rect {
+    transition: fill .15s ease, stroke .15s ease;
+  }
+  .clickable-edge:hover rect {
+    fill: #eff6ff !important;
+    stroke: var(--accent) !important;
+    stroke-width: 1.5px !important;
+  }
+  .clickable-edge.edge-rejected:hover rect {
+    fill: #fff1f2 !important;
+    stroke: #e11d48 !important;
+  }
+  .modal-ex-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal-ex-stack .sec-ex-card .demo-code {
+    font-size: 10.5px;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .48);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 120;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .modal-card {
+    width: min(920px, 95vw);
+    max-height: 86vh;
+    overflow: auto;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #dbe7ff;
+    border-radius: 20px;
+    box-shadow: 0 18px 48px rgba(15, 23, 42, .18);
+    padding: 26px 28px;
+  }
+  .modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .modal-head h3 {
+    font-size: 22px;
+    font-weight: 800;
+  }
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-close svg { width: 18px; height: 18px; }
+  .modal-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .modal-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: #e8f0ff;
+    border: 1px solid #d3e2ff;
+    border-radius: 999px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+  }
+  .modal-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+  }
+  .modal-item {
+    border: 1px solid #d7e3f8;
+    border-radius: 14px;
+    padding: 14px;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, .06);
+    grid-column: span 2;
+  }
+  .modal-item h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 7px;
+  }
+  .modal-item p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .modal-item.feature { grid-column: span 3; }
+  .modal-item h4 .emoji { margin-right: 5px; }
+  .modal-code {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.56;
+    background: linear-gradient(180deg, #0f172a 0%, #111b32 100%);
+    color: #ecf2ff;
+    border-radius: 10px;
+    border: 1px solid #1e2c4f;
+    padding: 10px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    white-space: pre-wrap;
+  }
+  .modal-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12.8px;
+    color: #334155;
+  }
+  .modal-list div::before {
+    content: "•";
+    color: var(--accent);
+    margin-right: 7px;
+    font-weight: 800;
+  }
+  .modal-diagram {
+    margin-top: 6px;
+  }
+  .modal-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .modal-layers .layer {
+    padding: 10px 16px;
+  }
+  .modal-layers .layer .l-title {
+    min-width: 220px;
+    font-size: 14px;
+  }
+  .modal-layers .layer .l-desc {
+    font-size: 12.5px;
+  }
+  .modal-layers .layer .l-example {
+    font-size: 10.5px;
+  }
+
+  /* ---------- What Could Go Wrong overview (slide 5) ---------- */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 8px;
+  }
+  .risk-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px 28px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-left: 5px solid var(--rose);
+  }
+  .risk-card:nth-child(2) { border-left-color: var(--amber); }
+  .risk-card-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .risk-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, var(--rose), #f43f5e);
+    flex-shrink: 0;
+  }
+  .risk-card:nth-child(2) .risk-num {
+    background: linear-gradient(135deg, var(--amber), #f59e0b);
+  }
+  .risk-card-head h3 {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -.01em;
+  }
+  .risk-desc {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.55;
+    padding-left: 50px;
+  }
+  .risk-example {
+    margin-top: 4px;
+    margin-left: 50px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .risk-question {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .risk-compare {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .risk-result {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+  .risk-result .label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .risk-result .value {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--rose);
+  }
+  .risk-card:nth-child(2) .risk-result .value { color: var(--amber); }
+  .risk-vs {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .risk-callout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #9f1239;
+    background: var(--rose-soft);
+    border: 1px solid #fecdd3;
+    border-radius: 10px;
+    padding: 10px 14px;
+    line-height: 1.35;
+  }
+  .risk-card:nth-child(2) .risk-callout {
+    color: #92400e;
+    background: var(--amber-soft);
+    border-color: #fde68a;
+  }
+
+  /* ---------- Roadmap idea cards (detail slides) ---------- */
+  .idea-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin-top: 6px;
+  }
+  .idea-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 0;
+    box-shadow: var(--shadow);
+    text-align: left;
+    overflow: hidden;
+    width: 100%;
+  }
+  .idea-visual {
+    padding: 15px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .idea-card:nth-child(1) .idea-visual { background: linear-gradient(180deg, #fff7ed 0%, #fff 100%); }
+  .idea-card:nth-child(2) .idea-visual { background: linear-gradient(180deg, #f5f3ff 0%, #fff 100%); }
+  .idea-card:nth-child(3) .idea-visual { background: linear-gradient(180deg, #ecfeff 0%, #fff 100%); }
+  .idea-num {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--violet));
+  }
+  .idea-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .idea-flag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+    color: #92400e; background: #fef3c7; border: 1px solid #fcd9a4;
+    border-radius: 999px; padding: 4px 9px;
+  }
+  .idea-demo {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 12px; display: flex; flex-direction: column; gap: 9px;
+  }
+  .idea-demo-q { font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.35; }
+  .idea-demo-rows { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .idea-demo-pill {
+    font-size: 11.5px; font-weight: 700; color: #475569;
+    background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 4px 9px;
+  }
+  .idea-demo-pill b { color: #b45309; }
+  .idea-demo-warn {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 800; color: #b45309;
+  }
+  .idea-mini-flow {
+    display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700;
+  }
+  .idea-mini-box {
+    flex: 1; border-radius: 10px; padding: 8px 6px; text-align: center; line-height: 1.25;
+    border: 1px solid var(--border);
+  }
+  .idea-mini-box.problem { background: #fff8eb; border-color: #fcd9a4; color: #92400e; }
+  .idea-mini-box.solution { background: #ecfdf8; border-color: #99f6e4; color: #0f766e; }
+  .idea-mini-arrow { color: var(--accent); font-size: 18px; font-weight: 800; flex-shrink: 0; }
+  .idea-icon-row { display: flex; justify-content: center; gap: 6px; font-size: 22px; line-height: 1; }
+  .idea-body { padding: 14px 16px 16px; border-top: 1px solid var(--border); }
+  .idea-body h3 { font-size: 16px; font-weight: 800; margin-bottom: 5px; line-height: 1.3; }
+  .idea-body p { font-size: 13.5px; color: var(--muted); line-height: 1.45; }
+  .idea-fix {
+    margin-top: 11px; font-size: 12.5px; font-weight: 700; color: #0f766e;
+    background: #ecfdf8; border: 1px solid #99f6e4; border-radius: 9px;
+    padding: 8px 11px; line-height: 1.35;
+  }
+  .idea-fix b { font-weight: 800; }
+  .idea-cta {
+    margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--accent);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .idea-cta svg { width: 14px; height: 14px; }
+  .slide-hint {
+    margin-top: 14px; text-align: center; font-size: 13px; color: var(--muted);
+  }
+  .slide-hint b { color: var(--accent); }
+  .roadmap-compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;
+  }
+  .roadmap-panel {
+    border-radius: 14px; border: 1px solid var(--border); padding: 14px 16px;
+  }
+  .roadmap-panel.problem { background: #fffaf2; border-color: #fcd9a4; }
+  .roadmap-panel.solution { background: #f0fdf9; border-color: #99f6e4; }
+  .roadmap-panel h4 {
+    font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .roadmap-panel.problem h4 { color: #92400e; }
+  .roadmap-panel.solution h4 { color: #0f766e; }
+  .roadmap-panel p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+  .roadmap-example {
+    margin-top: 14px; border-radius: 12px; border: 1px dashed #cbd5e1;
+    background: #f8fafc; padding: 12px 14px;
+  }
+  .roadmap-example h4 { font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+  .roadmap-example p { font-size: 13px; color: var(--muted); line-height: 1.45; }
+  .roadmap-demo {
+    margin-top: 16px;
+    border-radius: 14px;
+    border: 1px solid #dbe7ff;
+    background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
+    padding: 16px 18px;
+  }
+  .roadmap-demo > h4 {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .demo-question {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .demo-question .emoji { font-size: 20px; }
+  .demo-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .demo-box {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    background: #fff;
+  }
+  .demo-box.before { border-color: #fcd9a4; background: #fffaf2; }
+  .demo-box.after { border-color: #99f6e4; background: #f0fdf9; }
+  .demo-box h5 {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .demo-box.before h5 { color: #92400e; }
+  .demo-box.after h5 { color: #0f766e; }
+  .demo-box p, .demo-box li {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .demo-box ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
+  .demo-code {
+    margin-top: 8px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .demo-result {
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+  }
+  .demo-result.bad { color: #b45309; border-color: #fcd9a4; }
+  .demo-result.good { color: #0f766e; border-color: #99f6e4; }
+  .demo-arrow {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 10px 0;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .demo-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .demo-step {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+  .demo-step-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .demo-table-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .demo-table-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+  }
+  .demo-table-row.included { border-color: #99f6e4; background: #ecfdf8; }
+  .demo-table-row.excluded { border-color: #e2e8f0; background: #f8fafc; color: #94a3b8; text-decoration: line-through; }
+  .demo-table-row .icon { font-size: 14px; flex-shrink: 0; }
+  .demo-outcome {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+  .demo-outcome.warn { background: #fff7ed; color: #92400e; border: 1px solid #fcd9a4; }
+  .demo-outcome.ok { background: #ecfdf8; color: #0f766e; border: 1px solid #99f6e4; }
+  .demo-what-is {
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #dbe7ff;
+  }
+  .demo-what-is h5 {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .demo-what-is > p {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .demo-library {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .demo-library-entry {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #f8fafc;
+    overflow: hidden;
+  }
+  .demo-library-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #eef4ff;
+    border-bottom: 1px solid #dbe7ff;
+    font-size: 12.5px;
+  }
+  .demo-library-head .trigger { flex: 1; font-weight: 600; color: var(--ink); }
+  .demo-library-head .tag {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: #fff;
+    border: 1px solid #bfd4ff;
+    border-radius: 999px;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+  .demo-library-entry .demo-code {
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    font-size: 11px;
+  }
+  .diagram-caption {
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  @media (max-width: 1180px) {
+    .slide-sidebar { display: none; }
+    .slide { padding-left: 90px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter"></div>
+<aside class="slide-sidebar" aria-label="Slide navigation">
+  <div class="slide-sidebar-title">On This Page</div>
+  <ul class="slide-sidebar-list" id="slideSidebarList"></ul>
+</aside>
+
+<!-- ============ 1. TITLE ============ -->
+<section class="slide center">
+  <div class="slide-inner">
+    <div class="kicker">AI Staff Assistant</div>
+    <h1>How It Works<br>&amp; Where It Goes Next</h1>
+    <p class="subtitle" style="margin-inline:auto">Natural-language analytics on clinic data — powered by AWS Bedrock, guarded by your infrastructure.</p>
+    <div class="pill-row">
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> SQL Generation</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ambiguity Handling</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Security &amp; Isolation</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. AGENDA ============ -->
+<section class="slide" data-nav-section>
+  <div class="slide-inner">
+    <div class="kicker">Overview</div>
+    <h2>What We're Covering Today</h2>
+    <p class="lead">How the AI staff assistant works today, what we're improving next, and how we keep clinic data safe.</p>
+    <div class="agenda-grid">
+      <div class="agenda-card">
+        <div class="agenda-card-top">
+          <span class="agenda-num">01</span>
+          <div class="icon-badge violet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+        </div>
+        <h3>SQL Generation</h3>
+        <p>How plain language becomes safe queries — and the roadmap to make answers more reliable.</p>
+        <ul class="agenda-topics">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Schema-aware generation today</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Curated queries &amp; clarify-first</li>
+        </ul>
+      </div>
+      <div class="agenda-card">
+        <div class="agenda-card-top">
+          <span class="agenda-num">02</span>
+          <div class="icon-badge teal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+        </div>
+        <h3>Security &amp; Isolation</h3>
+        <p>Why letting AI query clinic data is safe — tenant boundaries and the SQL gate.</p>
+        <ul class="agenda-topics">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>One database per clinic</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Read-only, validated SELECT only</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. BIG PICTURE ============ -->
+<section class="slide" data-nav-section>
+  <div class="slide-inner">
+    <div class="kicker">Architecture</div>
+    <h2>The Big Picture</h2>
+    <p class="lead">The AI never touches the database directly — it only proposes SQL. Our application gate validates every query before anything runs.</p>
+    <div class="diagram">
+      <pre class="mermaid">
+flowchart LR
+  U["👩‍⚕️ Staff<br/>asks in plain language"] --> APP["🖥️ Application<br/>(FastAPI)"]
+  APP -->|"question + schema + today's date"| AI["🤖 AWS Bedrock Agent<br/>Claude Haiku 4.5"]
+  AI -->|"proposed SQL"| GATE["🛡️ SQL Gate<br/>validate &amp; sanitize"]
+  GATE -->|"approved SELECT only"| DB[("🗄️ Tenant Database<br/>PostgreSQL · read-only")]
+  DB -->|"rows"| GATE
+  GATE -->|"query results"| AI
+  AI -->|"answer + insight"| APP
+  APP --> U
+  style AI fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+  style GATE fill:#ccfbf1,stroke:#0d9488,stroke-width:2px
+  style DB fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+  style APP fill:#ffffff,stroke:#94a3b8
+  style U fill:#ffffff,stroke:#94a3b8
+      </pre>
+    </div>
+    <div class="pill-row">
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> AI proposes — <b>our app</b> executes (never the model)</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> DELETE / DROP / sensitive columns → blocked</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Read-only DB · one clinic per database</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. DIVIDER 1 ============ -->
+<section class="slide center">
+  <div class="slide-inner">
+    <div class="divider-num">01</div>
+    <h1>SQL Generation</h1>
+    <p class="divider-sub" style="margin-inline:auto">How a plain-language question becomes a safe, accurate database query.</p>
+  </div>
+</section>
+
+<!-- ============ 4. SQL: CURRENT ============ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="kicker">01 · Current Approach</div>
+    <h2>Schema-Aware Generation</h2>
+    <p class="lead">The model is briefed with the exact database schema, business rules, and today's date — then proposes SQL as a <em>request</em>, not an action.</p>
+    <div class="diagram" id="sql-briefing-diagram">
+      <pre class="mermaid">
+flowchart LR
+  subgraph BRIEF["📋 Briefing (every request)"]
+    S1["Table schemas<br/>(5 approved tables)"]
+    S2["Business rules<br/>&amp; join hints"]
+  end
+  S1 --> P["🧾 Prompt Context<br/>(runtime injection)"]
+  S2 --> P
+  Q["💬 User question"] --> P
+  P --> AI["🤖 Agent reasons<br/>about the question"]
+  AI --> SQL["📝 Proposes<br/>SELECT query"]
+  SQL --> V["🛡️ App validates<br/>&amp; executes"]
+  V --> R["📊 Results returned<br/>to the agent"]
+  R --> ANS["💬 Clear answer<br/>in plain language"]
+  style BRIEF fill:#f1f5f9,stroke:#94a3b8
+  style P fill:#fff7ed,stroke:#f59e0b,stroke-width:2px
+  style Q fill:#ffffff,stroke:#94a3b8
+  style AI fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+  style V fill:#ccfbf1,stroke:#0d9488,stroke-width:2px
+  style ANS fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+      </pre>
+    </div>
+    <div class="diagram-hint">Tip: click <b>Briefing</b> or <b>App validates &amp; executes</b> in the diagram for details.</div>
+    <div class="pill-row">
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Only knows tables we choose to expose</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Automatic row limits on every query</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. WHAT COULD GO WRONG: OVERVIEW ============ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="kicker rose">01 · Roadmap</div>
+    <h2>What Could Go Wrong</h2>
+    <p class="lead">The demo works — but these two things could go wrong anytime.</p>
+    <div class="risk-grid">
+      <div class="risk-card">
+        <div class="risk-card-head">
+          <span class="risk-num">1</span>
+          <h3>Same question, different answer</h3>
+        </div>
+        <p class="risk-desc">The AI writes fresh SQL each time, so everyday questions can return slightly different numbers.</p>
+        <div class="risk-example">
+          <div class="risk-question">"How many reservations today?"</div>
+          <div class="risk-compare">
+            <div class="risk-result">
+              <span class="label">Ask #1</span>
+              <span class="value">18</span>
+            </div>
+            <span class="risk-vs">vs</span>
+            <div class="risk-result">
+              <span class="label">Ask #2</span>
+              <span class="value">17</span>
+            </div>
+          </div>
+          <div class="risk-callout">Same question — different count</div>
+        </div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-card-head">
+          <span class="risk-num">2</span>
+          <h3>Vague questions, guessed answers</h3>
+        </div>
+        <p class="risk-desc">Staff ask in everyday language without dates or scope — the AI picks an interpretation and runs SQL without checking.</p>
+        <div class="risk-example">
+          <div class="risk-question">"How are we doing?"</div>
+          <div class="risk-compare">
+            <div class="risk-result">
+              <span class="label">This week</span>
+              <span class="value">42</span>
+            </div>
+            <span class="risk-vs">or</span>
+            <div class="risk-result">
+              <span class="label">This month</span>
+              <span class="value">186</span>
+            </div>
+          </div>
+          <div class="risk-callout">Which interpretation did they mean?</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-hint">Next slides dive deeper into each one</div>
+  </div>
+</section>
+
+<!-- ============ 6a. WHAT COULD GO WRONG: SAME QUESTION ============ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="kicker teal">01 · Roadmap &nbsp;·&nbsp; 1 of 4</div>
+    <h2>Same question, different answer</h2>
+    <div class="cols mt-lg">
+      <div class="diagram">
+        <pre class="mermaid">
+flowchart TB
+  subgraph LIB["📚 Curated Query Library — question → verified SQL"]
+    direction TB
+    L1["💬 How many reservations today?\n✅ SELECT COUNT(*) FROM reservations\nWHERE date = CURRENT_DATE"]
+    L2["💬 New patients this month?\n✅ SELECT COUNT(*) FROM patients\nWHERE created_at >= DATE_TRUNC('month', NOW())"]
+    L1 --- L2
+  end
+  Q["💬 Staff: How many reservations today?"] --> AGENT["🤖 Agent"]
+
+  AGENT -->|"🔴 Current"| ADHOC["Generate SQL on the fly"]
+  ADHOC --> DRIFT["⚠️ New SQL generated each time\nResults may differ"]
+
+  AGENT -->|"🟢 Improvement"| PICK["Pick matching template"]
+  LIB -.->|"pre-approved"| PICK
+  PICK --> SQL["Run verified SQL\nSELECT COUNT(*) FROM reservations\nWHERE date = CURRENT_DATE"]
+  SQL --> ANS["📊 Consistent answer every time"]
+
+  style LIB fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+  style PICK fill:#ecfdf8,stroke:#0d9488,stroke-width:2px
+  style SQL fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+  style ANS fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+  style ADHOC fill:#fff1f2,stroke:#e11d48,stroke-width:2px
+  style DRIFT fill:#fff1f2,stroke:#e11d48,stroke-width:2px,stroke-dasharray:4 3
+        </pre>
+      </div>
+      <div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+          <div class="idea-demo-q" style="font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:10px">💬 "How many reservations today?"</div>
+          <div class="idea-demo-rows">
+            <span class="idea-demo-pill">Ask #1 → <b>18</b></span>
+            <span class="idea-demo-pill">Ask #2 → <b>17</b></span>
+            <span class="idea-demo-warn">⚠ same question, different count</span>
+          </div>
+        </div>
+        <div class="roadmap-compare" style="margin-top:0">
+          <div class="roadmap-panel problem">
+            <h4>Problem today</h4>
+            <p>Same question → new SQL generated each time → results can drift between asks.</p>
+          </div>
+          <div class="roadmap-panel solution">
+            <h4>Planned fix</h4>
+            <p>Match to a curated query template — run pre-approved SQL from the library every time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pill-row">
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Curated query library</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Pre-approved SQL templates</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Consistent answer every time</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6a-practice. CURATED QUERIES IN PRACTICE ============ -->
+<section class="slide" data-nav-nested>
+  <div class="slide-inner">
+    <div class="kicker teal">01 · Roadmap &nbsp;·&nbsp; 2 of 4</div>
+    <h2>Curated queries in practice</h2>
+    <p class="lead">Recommended chat experience for clinic owners — every suggestion maps to a pre-approved SQL template.</p>
+    <div class="cols mt-lg" style="align-items:flex-start">
+      <div class="chat-window">
+        <div class="chat-window-head">💬 Staff Assistant</div>
+        <div class="chat-mock">
+          <div class="bubble bot">
+            <div class="b-label">Assistant</div>
+            How can I help you today?
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#eff6ff;border:1.5px solid #2563eb;border-radius:8px;cursor:pointer;">
+                <span style="font-size:13px;font-weight:700;color:#1e40af;">📅 How many reservations today?</span>
+                <span style="font-size:16px;margin-left:auto;">🔥</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
+                <span style="font-size:18px;width:20px;text-align:center;">🧑‍⚕️</span>
+                <span style="font-size:13px;color:#334155;">New patients this month</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
+                <span style="font-size:18px;width:20px;text-align:center;">💰</span>
+                <span style="font-size:13px;color:#334155;">Revenue this week</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
+                <span style="font-size:18px;width:20px;text-align:center;">⚠️</span>
+                <span style="font-size:13px;color:#334155;">No-shows by doctor</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
+                <span style="font-size:18px;width:20px;text-align:center;">⭐</span>
+                <span style="font-size:13px;color:#334155;">Top treatment this month</span>
+              </div>
+            </div>
+          </div>
+          <div class="bubble user">How many reservations today?</div>
+          <div class="bubble bot">
+            <div class="b-label">Assistant</div>
+            You have <b>18 reservations</b> today — 12 confirmed, 4 pending, 2 walk-ins.
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;align-self:center;">
+        <div style="padding:14px 16px;background:#eff6ff;border:1.5px dashed #2563eb;border-radius:12px;">
+          <div style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:4px;">↑ Each suggestion is a curated query</div>
+          <div style="font-size:13px;color:#1e40af;line-height:1.5">Tapping one maps directly to a pre-approved SQL template — no ad-hoc generation, same answer every time.</div>
+        </div>
+        <div style="padding:14px 16px;background:#ecfdf5;border:1.5px dashed #0d9488;border-radius:12px;">
+          <div style="font-size:13px;font-weight:700;color:#065f46;margin-bottom:4px;">✅ Verified SQL used</div>
+          <div style="font-size:13px;color:#065f46;line-height:1.5">Matched curated query template from the library — same pre-approved SQL every time.</div>
+        </div>
+      </div>
+    </div>
+    <div class="pill-row">
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Curated query library</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Pre-approved SQL templates</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Consistent answer every time</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6c. WHAT COULD GO WRONG: VAGUE QUESTIONS ============ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="kicker teal">01 · Roadmap &nbsp;·&nbsp; 3 of 4</div>
+    <h2>Vague questions, guessed answers</h2>
+    <div class="cols mt-lg">
+      <div class="diagram">
+        <pre class="mermaid">
+flowchart TB
+  Q["💬 Staff: How are we doing?"] --> AGENT["🤖 Agent"]
+
+  AGENT -->|"🔴 Current"| GUESS["Pick an interpretation\n(this week? this month?)"]
+  GUESS --> SQL["Run SQL immediately"]
+  SQL --> WRONG["⚠️ Answer may not match intent"]
+
+  AGENT -->|"🟢 Improvement"| ASK["Ask clarifying questions"]
+  ASK --> CONFIRM["Staff picks time range &amp; metric"]
+  CONFIRM --> SQL2["Run targeted SQL"]
+  SQL2 --> ANS["📊 Answer matches what they meant"]
+
+  style GUESS fill:#fff1f2,stroke:#e11d48,stroke-width:2px
+  style SQL fill:#fff1f2,stroke:#e11d48,stroke-width:2px
+  style WRONG fill:#fff1f2,stroke:#e11d48,stroke-width:2px,stroke-dasharray:4 3
+  style ASK fill:#ecfdf8,stroke:#0d9488,stroke-width:2px
+  style CONFIRM fill:#ecfdf8,stroke:#0d9488,stroke-width:2px
+  style SQL2 fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+  style ANS fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+        </pre>
+      </div>
+      <div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+          <div class="idea-demo-q" style="font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:10px">💬 "How are we doing?"</div>
+          <div class="idea-demo-rows">
+            <span class="idea-demo-pill">This week → <b>42</b></span>
+            <span class="idea-demo-pill">This month → <b>186</b></span>
+            <span class="idea-demo-warn">⚠ which did they mean?</span>
+          </div>
+        </div>
+        <div class="roadmap-compare" style="margin-top:0">
+          <div class="roadmap-panel problem">
+            <h4>Problem today</h4>
+            <p>Vague question → the AI silently picks dates, scope, or metrics → staff get an answer that may not match what they had in mind.</p>
+          </div>
+          <div class="roadmap-panel solution">
+            <h4>Planned fix</h4>
+            <p>Clarify-first — ask follow-up questions to pin down time range, metric, and scope before running any SQL.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pill-row">
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Clarify-first conversations</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Ask before querying</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Transparent assumptions</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6c-practice. CLARIFY-FIRST IN PRACTICE ============ -->
+<section class="slide" data-nav-nested>
+  <div class="slide-inner">
+    <div class="kicker teal">01 · Roadmap &nbsp;·&nbsp; 4 of 4</div>
+    <h2>Clarify-first in practice</h2>
+    <p class="lead">When a question is vague, the assistant asks follow-ups instead of guessing — then runs SQL once intent is clear.</p>
+    <div class="cols mt-lg" style="align-items:flex-start">
+      <div class="chat-window">
+        <div class="chat-window-head">💬 Staff Assistant</div>
+        <div class="chat-mock">
+          <div class="bubble user">How are we doing?</div>
+          <div class="bubble bot">
+            <div class="b-label">Assistant</div>
+            Happy to help — what would you like to check?
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#eff6ff;border:1.5px solid #2563eb;border-radius:8px;cursor:pointer;">
+                <span style="font-size:13px;font-weight:700;color:#1e40af;">📅 Reservations</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
+                <span style="font-size:18px;width:20px;text-align:center;">💰</span>
+                <span style="font-size:13px;color:#334155;">Revenue</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
+                <span style="font-size:18px;width:20px;text-align:center;">🧑‍⚕️</span>
+                <span style="font-size:13px;color:#334155;">New patients</span>
+              </div>
+            </div>
+          </div>
+          <div class="bubble user">Reservations</div>
+          <div class="bubble bot">
+            <div class="b-label">Assistant</div>
+            For which period?
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+              <span style="font-size:12px;font-weight:700;color:#1e40af;background:#eff6ff;border:1.5px solid #2563eb;border-radius:8px;padding:6px 10px;cursor:pointer;">Today</span>
+              <span style="font-size:12px;font-weight:700;color:#334155;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;cursor:pointer;">This week</span>
+              <span style="font-size:12px;font-weight:700;color:#334155;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;cursor:pointer;">This month</span>
+            </div>
+          </div>
+          <div class="bubble user">This week</div>
+          <div class="bubble bot">
+            <div class="b-label">Assistant</div>
+            You have <b>42 reservations</b> this week — 31 completed, 8 upcoming, 3 cancelled.
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;align-self:center;">
+        <div style="padding:14px 16px;background:#eff6ff;border:1.5px dashed #2563eb;border-radius:12px;">
+          <div style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:4px;">↑ Ask before querying</div>
+          <div style="font-size:13px;color:#1e40af;line-height:1.5">A vague question triggers follow-ups for metric and time range — no silent guesswork.</div>
+        </div>
+        <div style="padding:14px 16px;background:#ecfdf5;border:1.5px dashed #0d9488;border-radius:12px;">
+          <div style="font-size:13px;font-weight:700;color:#065f46;margin-bottom:4px;">✅ SQL runs after intent is clear</div>
+          <div style="font-size:13px;color:#065f46;line-height:1.5">Once staff pick reservations · this week, the assistant runs targeted SQL and states its assumptions.</div>
+        </div>
+      </div>
+    </div>
+    <div class="pill-row">
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Clarify-first conversations</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Ask before querying</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Transparent assumptions</span>
+    </div>
+  </div>
+</section>
+<!-- ============ 9. DIVIDER 2 ============ -->
+<section class="slide center">
+  <div class="slide-inner">
+    <div class="divider-num">02</div>
+    <h1>Security &amp; Tenant Isolation</h1>
+    <p class="divider-sub" style="margin-inline:auto">Letting AI query your database sounds risky — here's exactly how we keep it safe.</p>
+  </div>
+</section>
+
+<!-- ============ 10. SECURITY: MENTAL MODEL ============ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="kicker">02 · The Core Idea</div>
+    <h2>Can the AI Run SQL on Our Database?</h2>
+    <p class="lead">No — the model only <em>proposes</em> SQL. Our app decides what runs: every query is validated and executed read-only on your clinic's database.</p>
+    <div class="cols mt-lg">
+      <div class="diagram" id="sql-gate-diagram">
+        <pre class="mermaid">
+flowchart LR
+  Q["💬 Staff asks<br/>a question"] --> AI["🤖 AI drafts SQL<br/>(a proposal only)"]
+  AI --> GATE["🛡️ SQL Gate<br/>6 rule checks<br/><span style='font-size:11px;color:#2563eb'>↗ click for details</span>"]
+  GATE -->|"✅ approved"| DB[("🗄️ Read-only DB<br/>your clinic only")]
+  GATE -->|"❌ rejected"| ERR["⚠️ Error sent back<br/>AI must fix &amp; retry"]
+  DB --> ANS["📊 Safe answer"]
+  style AI fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+  style GATE fill:#ccfbf1,stroke:#0d9488,stroke-width:2px
+  style DB fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+  style ERR fill:#fff1f2,stroke:#e11d48
+  style ANS fill:#ecfdf8,stroke:#0d9488,stroke-width:2px
+        </pre>
+      </div>
+      <div class="sec-steps">
+        <div class="sec-step">
+          <span class="sec-step-num">1</span>
+          <div><strong>AI has no database connection</strong><span>It only outputs text — a SQL string. It cannot execute anything itself.</span></div>
+        </div>
+        <div class="sec-step">
+          <span class="sec-step-num">2</span>
+          <div><strong>Our app parses every query</strong><span>The SQL Gate reads the query structure (AST) and rejects anything that breaks the rules.</span></div>
+        </div>
+        <div class="sec-step">
+          <span class="sec-step-num">3</span>
+          <div><strong>Only then does it run — read-only</strong><span>Approved SELECT queries run on a read-only DB user, scoped to the logged-in clinic.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="diagram-hint">Tip: click <b>SQL Gate</b>, <b>✅ approved</b>, or <b>❌ rejected</b> in the diagram for details.</div>
+  </div>
+</section>
+
+<!-- ============ 11. SECURITY: CROSS-TENANT ============ -->
+<section class="slide">
+  <div class="slide-inner">
+    <div class="kicker">02 · Tenant Isolation</div>
+    <h2>Can the AI Reach Another Clinic's Database?</h2>
+    <p class="lead">No — the application picks the database from the logged-in clinic. The AI has no say in which tenant it connects to.</p>
+    <div class="diagram mt-lg">
+      <pre class="mermaid">
+flowchart LR
+  AI["🤖 AI Model"] -.->|"🚫 has no say in<br/>database selection"| X["✖️"]
+  APP["🖥️ Application layer<br/>fixes the tenant<br/>per request"] -->|"connects only to"| DBA[("🏥 Clinic A<br/>database")]
+  DBB[("🏥 Clinic B<br/>database")]
+  APP x--x DBB
+  style AI fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+  style APP fill:#ccfbf1,stroke:#0d9488,stroke-width:2px
+  style DBA fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+  style DBB fill:#f1f5f9,stroke:#cbd5e1,stroke-dasharray:4
+  style X fill:#ffe4e6,stroke:#e11d48
+      </pre>
+    </div>
+    <div class="grid grid-2 mt-lg">
+      <div class="verdict v-ok">
+        <div class="big-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+        <div>
+          <h3>No — the model can't cross over</h3>
+          <p>The database is selected by the application, outside the AI's control. No prompt, no generated SQL can switch tenants.</p>
+        </div>
+      </div>
+      <div class="verdict v-warn">
+        <div class="big-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div>
+          <h3>Demo scope: no login yet</h3>
+          <p>The demo trusts the tenant chosen on screen. Production would add login so each user is bound to their clinic.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 15. CLOSING ============ -->
+<section class="slide center">
+  <div class="slide-inner">
+    <div class="kicker">Thank You</div>
+    <h1>Questions &amp; Discussion</h1>
+    <p class="subtitle" style="margin-inline:auto">Safe by design today. Ready to grow into production tomorrow.</p>
+  </div>
+</section>
+
+<div class="modal-overlay" id="briefingModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="briefingModalTitle">
+    <div class="modal-head">
+      <div>
+        <span class="modal-kicker">Live Prompt Context</span>
+        <h3 id="briefingModalTitle">📋 Briefing Details (Per Request)</h3>
+        <p class="modal-sub">Before SQL generation, these inputs are injected into the agent context.</p>
+      </div>
+      <button class="modal-close" id="briefingModalClose" aria-label="Close popup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-grid">
+      <div class="modal-item feature">
+        <h4><span class="emoji">🗂️</span>Example Table Schemas</h4>
+        <p>Only approved columns are exposed to the agent context.</p>
+        <div class="modal-code">patient_users(id, clinic_code, created_at, deleted_at)
+patient_profiles(user_id, full_name, birth_date)
+reservations(id, patient_user_id, reservation_date, status)</div>
+      </div>
+      <div class="modal-item feature">
+        <h4><span class="emoji">🔗</span>Example Join Hints</h4>
+        <p>The briefing includes canonical join paths to avoid wrong joins.</p>
+        <div class="modal-code">reservations.patient_user_id = patient_users.id
+patient_profiles.user_id = patient_users.id
+service_items.reservation_id = reservations.id</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="executionModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="executionModalTitle">
+    <div class="modal-head">
+      <div>
+        <h3 id="executionModalTitle">🛡️ App Validation &amp; Execution</h3>
+      </div>
+      <button class="modal-close" id="executionModalClose" aria-label="Close popup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="diagram modal-diagram">
+      <pre class="mermaid">
+flowchart LR
+  AI["🤖 Agent<br/>proposes SQL"] --> RULES["📏 Validation rules<br/>(details below)"]
+  RULES --> CHECK{"🛡️ Passes<br/>validation?"}
+  CHECK -->|"✅ yes"| RUN["▶️ Execute on<br/>read-only DB"]
+  CHECK -->|"❌ no"| ERR["⚠️ Error message<br/>sent back to agent"]
+  ERR --> FIX["🔧 Agent corrects<br/>the query"]
+  FIX --> CHECK
+  RUN --> DONE["💬 Answer"]
+  style AI fill:#ede9fe,stroke:#7c3aed,stroke-width:2px
+  style RULES fill:#fff7ed,stroke:#f59e0b,stroke-width:2px
+  style CHECK fill:#ccfbf1,stroke:#0d9488,stroke-width:2px
+  style ERR fill:#fef3c7,stroke:#d97706
+  style DONE fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+      </pre>
+    </div>
+    <div class="modal-list" style="margin-top:14px">
+      <div>Only <code>SELECT</code> is allowed; non-SELECT statements are rejected.</div>
+      <div>Only one statement is allowed; multiple statements are blocked.</div>
+      <div>Only allowlisted tables can be queried.</div>
+      <div>Blocked columns cannot be selected.</div>
+      <div>Soft-delete tables must include <code>deleted_at IS NULL</code>.</div>
+      <div>If <code>LIMIT</code> is missing, the app auto-adds <code>LIMIT 100</code>.</div>
+      <div>If validation fails, the agent gets the error and retries with a corrected query.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="promptContextModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="promptContextModalTitle">
+    <div class="modal-head">
+      <div>
+        <span class="modal-kicker">System Prompt · English</span>
+        <h3 id="promptContextModalTitle">🧾 Prompt Context (Runtime Injection)</h3>
+        <p class="modal-sub">This is the system instruction shown when clicking the Prompt Context box.</p>
+      </div>
+      <button class="modal-close" id="promptContextModalClose" aria-label="Close popup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-item feature" style="grid-column: span 6; padding:0; border:none; box-shadow:none; background:transparent">
+      <div class="modal-code">You are an analytics assistant for clinic staff.
+
+Language:
+- Use Japanese as the primary response language.
+
+Today's date:
+- $today$
+
+Available schema:
+- $schema_context$
+
+Rules:
+- For data-related questions, call run_readonly_sql using a PostgreSQL SELECT query.
+- Follow each table's filters, prohibited columns, and examples defined in the schema context above.
+- Use LIMIT 100 unless you are using COUNT(*).
+- Summarize results in clear Japanese. Do not output raw JSON to users.
+- If the required table is not in the provided schema, explain that limitation.
+- Always answer in Japanese.
+- If your response includes detailed data or attachments, end with: "Please see the details below."
+- Do not explain internal system operations (file paths, S3, image processing, etc.) to users.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="sqlGateLayersModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="sqlGateLayersModalTitle">
+    <div class="modal-head">
+      <div>
+        <span class="modal-kicker">02 · Defense in Depth</span>
+        <h3 id="sqlGateLayersModalTitle">🛡️ Six Independent Safety Layers</h3>
+        <p class="modal-sub">Every layer must pass before a single row is returned — even if one safeguard were bypassed, the others still protect your data.</p>
+      </div>
+      <button class="modal-close" id="sqlGateLayersModalClose" aria-label="Close popup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="layers modal-layers">
+      <div class="layer"><span class="l-num">1</span><span class="l-title">🏢 One database per clinic</span><span class="l-desc">Physical separation — Clinic A and Clinic B never share tables or storage.<span class="l-example">App connects to clinic_a_db — not clinic_b_db</span></span></div>
+      <div class="layer"><span class="l-num">2</span><span class="l-title">🔒 Read-only credentials</span><span class="l-desc">The assistant's DB user has SELECT permission only — no INSERT, UPDATE, or DELETE.<span class="l-example">Even if DELETE slipped past the parser, the DB would refuse it</span></span></div>
+      <div class="layer"><span class="l-num">3</span><span class="l-title">🧬 SELECT-only parser gate</span><span class="l-desc">Every query is parsed as an AST; anything but a single SELECT is rejected.<span class="l-example">DELETE, DROP, TRUNCATE, UPDATE → all blocked at parse time</span></span></div>
+      <div class="layer"><span class="l-num">4</span><span class="l-title">📋 Table allowlist</span><span class="l-desc">Only 5 approved clinic tables; system catalogs and internals are blocked.<span class="l-example">patient_users, reservations, … — not pg_tables or information_schema</span></span></div>
+      <div class="layer"><span class="l-num">5</span><span class="l-title">🙈 Sensitive-column blocklist</span><span class="l-desc">Passwords, hashes, and encrypted fields can never be selected.<span class="l-example">password, email_hash, token columns → auto-detected and blocked</span></span></div>
+      <div class="layer"><span class="l-num">6</span><span class="l-title">✂️ Row cap &amp; soft-delete filter</span><span class="l-desc">Automatic LIMIT 100; deleted records require explicit deleted_at IS NULL.<span class="l-example">No runaway full-table dumps; archived rows stay hidden</span></span></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="sqlGateBlockedModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="sqlGateBlockedModalTitle">
+    <div class="modal-head">
+      <div>
+        <span class="modal-kicker">02 · Blocked Examples</span>
+        <h3 id="sqlGateBlockedModalTitle">❌ What the SQL Gate Rejects</h3>
+        <p class="modal-sub">Even if the AI tries something dangerous, the gate stops it before it touches your data.</p>
+      </div>
+      <button class="modal-close" id="sqlGateBlockedModalClose" aria-label="Close popup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-ex-stack">
+      <div class="sec-ex-card blocked">
+        <h5>❌ Blocked — destructive command</h5>
+        <div class="staff-q">💬 "Delete all cancelled reservations"</div>
+        <div class="demo-code">DELETE FROM reservations
+WHERE status = 90</div>
+        <div class="sec-ex-verdict">🚫 Rejected: Only SELECT statements are allowed</div>
+      </div>
+      <div class="sec-ex-card blocked">
+        <h5>❌ Blocked — hidden system tables</h5>
+        <div class="staff-q">💬 "Show me all database tables"</div>
+        <div class="demo-code">SELECT * FROM pg_catalog.pg_tables</div>
+        <div class="sec-ex-verdict">🚫 Rejected: Table not on allowlist (only 5 clinic tables permitted)</div>
+      </div>
+      <div class="sec-ex-card blocked">
+        <h5>❌ Blocked — sensitive columns</h5>
+        <div class="staff-q">💬 "List patient passwords"</div>
+        <div class="demo-code">SELECT password, email_hash
+FROM patient_users</div>
+        <div class="sec-ex-verdict">🚫 Rejected: Column not allowed (passwords &amp; hashes are blocked)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="sqlGateAllowedModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="sqlGateAllowedModalTitle">
+    <div class="modal-head">
+      <div>
+        <span class="modal-kicker">02 · Allowed Example</span>
+        <h3 id="sqlGateAllowedModalTitle">✅ What the SQL Gate Approves</h3>
+        <p class="modal-sub">A normal analytics query that passes all checks and runs safely on the read-only database.</p>
+      </div>
+      <button class="modal-close" id="sqlGateAllowedModalClose" aria-label="Close popup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-ex-stack">
+      <div class="sec-ex-card allowed">
+        <h5>✅ Allowed — normal analytics</h5>
+        <div class="staff-q">💬 "How many reservations today?"</div>
+        <div class="demo-code">SELECT COUNT(*) FROM reservations
+WHERE deleted_at IS NULL
+  AND start_at::date = CURRENT_DATE
+LIMIT 100</div>
+        <div class="sec-ex-verdict">✅ Runs safely — soft-delete filter enforced, LIMIT auto-added</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <button id="next" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: "base",
+    themeVariables: {
+      fontFamily: "Inter, sans-serif",
+      fontSize: "15px",
+      primaryColor: "#ffffff",
+      primaryTextColor: "#0f172a",
+      primaryBorderColor: "#94a3b8",
+      lineColor: "#64748b",
+      clusterBkg: "#f8fafc",
+      clusterBorder: "#cbd5e1",
+      edgeLabelBackground: "#ffffff"
+    },
+    flowchart: { curve: "basis", htmlLabels: true, padding: 12 }
+  });
+
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const progress = document.getElementById("progress");
+  const counter = document.getElementById("counter");
+  const slideSidebarList = document.getElementById("slideSidebarList");
+  const briefingModal = document.getElementById("briefingModal");
+  const briefingModalClose = document.getElementById("briefingModalClose");
+  const executionModal = document.getElementById("executionModal");
+  const executionModalClose = document.getElementById("executionModalClose");
+  const promptContextModal = document.getElementById("promptContextModal");
+  const promptContextModalClose = document.getElementById("promptContextModalClose");
+  const sqlGateLayersModal = document.getElementById("sqlGateLayersModal");
+  const sqlGateLayersModalClose = document.getElementById("sqlGateLayersModalClose");
+  const sqlGateBlockedModal = document.getElementById("sqlGateBlockedModal");
+  const sqlGateBlockedModalClose = document.getElementById("sqlGateBlockedModalClose");
+  const sqlGateAllowedModal = document.getElementById("sqlGateAllowedModal");
+  const sqlGateAllowedModalClose = document.getElementById("sqlGateAllowedModalClose");
+  let current = 0;
+  let subNum = 0;
+  let nestedNum = 0;
+
+  const slideNavButtons = slides.map((slide, idx) => {
+    const heading = slide.querySelector("h2, h1");
+    const kicker = slide.querySelector(".kicker");
+    const dividerNum = slide.querySelector(".divider-num");
+    const headingText = heading ? heading.textContent.trim().replace(/\s+/g, " ") : `Slide ${idx + 1}`;
+    const kickerText = kicker ? kicker.textContent.trim().replace(/\s+/g, " ") : "";
+    const dividerText = dividerNum ? `${dividerNum.textContent.trim().padStart(2, "0")} · ${headingText}` : "";
+    const isSection = idx === 0 || slide.hasAttribute("data-nav-section") || Boolean(dividerNum);
+    const isNested = slide.hasAttribute("data-nav-nested");
+    if (isSection) {
+      subNum = 0;
+      nestedNum = 0;
+    } else if (isNested) {
+      nestedNum += 1;
+    } else {
+      subNum += 1;
+      nestedNum = 0;
+    }
+    const rawLabel = idx === 0
+      ? "Introduction"
+      : (dividerText || headingText || kickerText || `Slide ${idx + 1}`);
+    const maxLen = isSection ? 28 : (isNested ? 22 : 26);
+    const compactLabel = rawLabel.length > maxLen ? rawLabel.slice(0, maxLen - 3).trim() + "..." : rawLabel;
+
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+    button.type = "button";
+    const navLevel = isSection ? "section" : (isNested ? "sub-nested" : "sub");
+    button.className = `slide-sidebar-link ${navLevel}`;
+    const numMarkup = isSection
+      ? ""
+      : `<span class="num">${isNested ? `${subNum}.${nestedNum}` : `${subNum}.`}</span>`;
+    button.innerHTML = `${numMarkup}<span class="txt">${compactLabel}</span>`;
+    button.setAttribute("aria-label", `Go to slide ${idx + 1}`);
+    button.title = `${idx + 1}. ${[dividerText, kickerText, headingText].filter(Boolean).join(" · ")}`;
+    button.addEventListener("click", () => show(idx));
+    item.appendChild(button);
+    slideSidebarList.appendChild(item);
+    return button;
+  });
+
+  function openBriefingModal() {
+    briefingModal.classList.add("open");
+    briefingModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeBriefingModal() {
+    briefingModal.classList.remove("open");
+    briefingModal.setAttribute("aria-hidden", "true");
+  }
+
+  function openExecutionModal() {
+    executionModal.classList.add("open");
+    executionModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeExecutionModal() {
+    executionModal.classList.remove("open");
+    executionModal.setAttribute("aria-hidden", "true");
+  }
+
+  function openPromptContextModal() {
+    promptContextModal.classList.add("open");
+    promptContextModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closePromptContextModal() {
+    promptContextModal.classList.remove("open");
+    promptContextModal.setAttribute("aria-hidden", "true");
+  }
+
+  function openSqlGateLayersModal() {
+    sqlGateLayersModal.classList.add("open");
+    sqlGateLayersModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeSqlGateLayersModal() {
+    sqlGateLayersModal.classList.remove("open");
+    sqlGateLayersModal.setAttribute("aria-hidden", "true");
+  }
+
+  function openSqlGateBlockedModal() {
+    sqlGateBlockedModal.classList.add("open");
+    sqlGateBlockedModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeSqlGateBlockedModal() {
+    sqlGateBlockedModal.classList.remove("open");
+    sqlGateBlockedModal.setAttribute("aria-hidden", "true");
+  }
+
+  function openSqlGateAllowedModal() {
+    sqlGateAllowedModal.classList.add("open");
+    sqlGateAllowedModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeSqlGateAllowedModal() {
+    sqlGateAllowedModal.classList.remove("open");
+    sqlGateAllowedModal.setAttribute("aria-hidden", "true");
+  }
+
+  function hasOpenModal() {
+    return (
+      briefingModal.classList.contains("open") ||
+      executionModal.classList.contains("open") ||
+      promptContextModal.classList.contains("open") ||
+      sqlGateLayersModal.classList.contains("open") ||
+      sqlGateBlockedModal.classList.contains("open") ||
+      sqlGateAllowedModal.classList.contains("open")
+    );
+  }
+
+  function bindBriefingNodeClick() {
+    const container = document.getElementById("sql-briefing-diagram");
+    if (!container) return false;
+
+    const groups = container.querySelectorAll("svg g.cluster");
+    let found = false;
+
+    groups.forEach((group) => {
+      const label = group.querySelector("g.cluster-label");
+      const labelText = label ? label.textContent : "";
+      if (!labelText || !labelText.includes("Briefing (every request)")) return;
+      if (group.dataset.briefingBound === "1") return;
+
+      group.dataset.briefingBound = "1";
+      group.classList.add("clickable-briefing");
+      group.setAttribute("role", "button");
+      group.setAttribute("tabindex", "0");
+      group.setAttribute("aria-label", "Open briefing details");
+      group.addEventListener("click", openBriefingModal);
+      group.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openBriefingModal();
+        }
+      });
+      found = true;
+    });
+
+    return found;
+  }
+
+  function bindValidationNodeClick() {
+    const container = document.getElementById("sql-briefing-diagram");
+    if (!container) return false;
+
+    const nodes = container.querySelectorAll("svg g.node");
+    let found = false;
+
+    nodes.forEach((node) => {
+      const labelText = node.textContent || "";
+      const isValidationNode = labelText.includes("App validates") && labelText.includes("executes");
+      if (!isValidationNode) return;
+      if (node.dataset.executionBound === "1") return;
+
+      node.dataset.executionBound = "1";
+      node.classList.add("clickable-node");
+      node.setAttribute("role", "button");
+      node.setAttribute("tabindex", "0");
+      node.setAttribute("aria-label", "Open slide 5 execution flow popup");
+      node.addEventListener("click", openExecutionModal);
+      node.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openExecutionModal();
+        }
+      });
+      found = true;
+    });
+
+    return found;
+  }
+
+  function bindPromptContextNodeClick() {
+    const container = document.getElementById("sql-briefing-diagram");
+    if (!container) return false;
+
+    const nodes = container.querySelectorAll("svg g.node");
+    let found = false;
+
+    nodes.forEach((node) => {
+      const labelText = node.textContent || "";
+      const isPromptContextNode = labelText.includes("Prompt Context") && labelText.includes("runtime injection");
+      if (!isPromptContextNode) return;
+      if (node.dataset.promptContextBound === "1") return;
+
+      node.dataset.promptContextBound = "1";
+      node.classList.add("clickable-node");
+      node.setAttribute("role", "button");
+      node.setAttribute("tabindex", "0");
+      node.setAttribute("aria-label", "Open system prompt popup");
+      node.addEventListener("click", openPromptContextModal);
+      node.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openPromptContextModal();
+        }
+      });
+      found = true;
+    });
+
+    return found;
+  }
+
+  function bindSqlGateNodeClick() {
+    const container = document.getElementById("sql-gate-diagram");
+    if (!container) return false;
+
+    const nodes = container.querySelectorAll("svg g.node");
+    let found = false;
+
+    nodes.forEach((node) => {
+      const labelText = node.textContent || "";
+      const isSqlGateNode = labelText.includes("SQL Gate") && labelText.includes("6 rule");
+      if (!isSqlGateNode) return;
+      if (node.dataset.sqlGateBound === "1") return;
+
+      node.dataset.sqlGateBound = "1";
+      node.classList.add("clickable-node");
+      node.setAttribute("role", "button");
+      node.setAttribute("tabindex", "0");
+      node.setAttribute("aria-label", "Open SQL Gate safety layers");
+      node.addEventListener("click", openSqlGateLayersModal);
+      node.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openSqlGateLayersModal();
+        }
+      });
+      found = true;
+    });
+
+    return found;
+  }
+
+  function bindSqlGateEdgeClick() {
+    const container = document.getElementById("sql-gate-diagram");
+    if (!container) return false;
+
+    const edgeLabels = container.querySelectorAll("svg g.edgeLabel, svg .edgeLabel");
+    let foundApproved = false;
+    let foundRejected = false;
+
+    edgeLabels.forEach((label) => {
+      const text = (label.textContent || "").toLowerCase();
+      const isApproved = text.includes("approved");
+      const isRejected = text.includes("rejected");
+      if (!isApproved && !isRejected) return;
+
+      const boundKey = isApproved ? "edgeApprovedBound" : "edgeRejectedBound";
+      if (label.dataset[boundKey] === "1") {
+        if (isApproved) foundApproved = true;
+        if (isRejected) foundRejected = true;
+        return;
+      }
+
+      label.dataset[boundKey] = "1";
+      label.classList.add("clickable-edge");
+      if (isRejected) label.classList.add("edge-rejected");
+      label.setAttribute("role", "button");
+      label.setAttribute("tabindex", "0");
+      label.setAttribute(
+        "aria-label",
+        isApproved ? "Open allowed SQL examples" : "Open blocked SQL examples"
+      );
+
+      const openModal = isApproved ? openSqlGateAllowedModal : openSqlGateBlockedModal;
+      label.addEventListener("click", openModal);
+      label.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openModal();
+        }
+      });
+
+      if (isApproved) foundApproved = true;
+      if (isRejected) foundRejected = true;
+    });
+
+    return foundApproved && foundRejected;
+  }
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, idx) => s.classList.toggle("active", idx === current));
+    slideNavButtons.forEach((btn, idx) => btn.classList.toggle("active", idx === current));
+    const activeButton = slideNavButtons[current];
+    if (activeButton) activeButton.scrollIntoView({ block: "nearest" });
+    progress.style.width = ((current + 1) / slides.length * 100) + "%";
+    counter.textContent = (current + 1) + " / " + slides.length;
+    location.hash = current + 1;
+  }
+
+  document.getElementById("next").addEventListener("click", () => show(current + 1));
+  document.getElementById("prev").addEventListener("click", () => show(current - 1));
+  briefingModalClose.addEventListener("click", closeBriefingModal);
+  executionModalClose.addEventListener("click", closeExecutionModal);
+  promptContextModalClose.addEventListener("click", closePromptContextModal);
+  sqlGateLayersModalClose.addEventListener("click", closeSqlGateLayersModal);
+  sqlGateBlockedModalClose.addEventListener("click", closeSqlGateBlockedModal);
+  sqlGateAllowedModalClose.addEventListener("click", closeSqlGateAllowedModal);
+  briefingModal.addEventListener("click", (e) => {
+    if (e.target === briefingModal) closeBriefingModal();
+  });
+  executionModal.addEventListener("click", (e) => {
+    if (e.target === executionModal) closeExecutionModal();
+  });
+  promptContextModal.addEventListener("click", (e) => {
+    if (e.target === promptContextModal) closePromptContextModal();
+  });
+  sqlGateLayersModal.addEventListener("click", (e) => {
+    if (e.target === sqlGateLayersModal) closeSqlGateLayersModal();
+  });
+  sqlGateBlockedModal.addEventListener("click", (e) => {
+    if (e.target === sqlGateBlockedModal) closeSqlGateBlockedModal();
+  });
+  sqlGateAllowedModal.addEventListener("click", (e) => {
+    if (e.target === sqlGateAllowedModal) closeSqlGateAllowedModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && hasOpenModal()) {
+      e.preventDefault();
+      closeBriefingModal();
+      closeExecutionModal();
+      closePromptContextModal();
+      closeSqlGateLayersModal();
+      closeSqlGateBlockedModal();
+      closeSqlGateAllowedModal();
+      return;
+    }
+    if (hasOpenModal()) return;
+    if (["ArrowRight", "ArrowDown", " ", "PageDown"].includes(e.key)) { e.preventDefault(); show(current + 1); }
+    if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); show(current - 1); }
+    if (e.key === "Home") show(0);
+    if (e.key === "End") show(slides.length - 1);
+  });
+
+  let bindAttempts = 0;
+  const bindTimer = setInterval(() => {
+    bindAttempts += 1;
+    const boundBriefing = bindBriefingNodeClick();
+    const boundValidation = bindValidationNodeClick();
+    const boundPromptContext = bindPromptContextNodeClick();
+    const boundSqlGate = bindSqlGateNodeClick();
+    const boundSqlGateEdges = bindSqlGateEdgeClick();
+    if ((boundBriefing && boundValidation && boundPromptContext && boundSqlGate && boundSqlGateEdges) || bindAttempts >= 12) clearInterval(bindTimer);
+  }, 250);
+
+  const fromHash = parseInt(location.hash.slice(1), 10);
+  show(Number.isFinite(fromHash) ? fromHash - 1 : 0);
+</script>
+</body>
+</html>
