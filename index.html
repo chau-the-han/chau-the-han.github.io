@@ -1208,27 +1208,66 @@
     .slide-sidebar { display: none; }
     .slide { padding-left: 90px; }
   }
+
+  /* ---------- Language switch ---------- */
+  .lang-switch {
+    position: fixed;
+    top: 18px;
+    right: 26px;
+    z-index: 70;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    font-family: inherit;
+  }
+  .lang-switch button {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 7px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .lang-switch button.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .lang-switch button:hover:not(.active) {
+    color: var(--ink);
+  }
 </style>
 </head>
 <body>
 
 <div class="progress" id="progress"></div>
 <div class="counter" id="counter"></div>
+<div class="lang-switch" role="group" aria-label="Language">
+  <button type="button" id="langEn" class="active" aria-pressed="true">EN</button>
+  <button type="button" id="langJa" aria-pressed="false">日本語</button>
+</div>
 <aside class="slide-sidebar" aria-label="Slide navigation">
-  <div class="slide-sidebar-title">On This Page</div>
+  <div class="slide-sidebar-title" data-i18n="sidebar.title">On This Page</div>
   <ul class="slide-sidebar-list" id="slideSidebarList"></ul>
 </aside>
 
 <!-- ============ 1. TITLE ============ -->
 <section class="slide center">
   <div class="slide-inner">
-    <div class="kicker">AI Staff Assistant</div>
-    <h1>How It Works<br>&amp; What could be improving</h1>
-    <p class="subtitle" style="margin-inline:auto">Natural-language analytics on clinic data — powered by AWS Bedrock, guarded by your infrastructure.</p>
+    <div class="kicker" data-i18n="s1.kicker">AI Staff Assistant</div>
+    <h1 data-i18n-html="s1.h1">How It Works<br>&amp; What could be improving</h1>
+    <p class="subtitle" style="margin-inline:auto" data-i18n="s1.sub">Natural-language analytics on clinic data — powered by AWS Bedrock, guarded by your infrastructure.</p>
     <div class="pill-row">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> SQL Generation</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ambiguity Handling</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Security &amp; Isolation</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> <span data-i18n="s1.pill1">SQL Generation</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> <span data-i18n="s1.pill2">Ambiguity Handling</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span data-i18n="s1.pill3">Security &amp; Isolation</span></span>
     </div>
   </div>
 </section>
@@ -1236,9 +1275,9 @@
 <!-- ============ 2. AGENDA ============ -->
 <section class="slide" data-nav-section>
   <div class="slide-inner">
-    <div class="kicker">Overview</div>
-    <h2>What We're Covering Today</h2>
-    <p class="lead">How the AI staff assistant works today, what we're improving next, and how we keep clinic data safe.</p>
+    <div class="kicker" data-i18n="s2.kicker">Overview</div>
+    <h2 data-i18n="s2.h2">What We're Covering Today</h2>
+    <p class="lead" data-i18n="s2.lead">How the AI staff assistant works today, what we're improving next, and how we keep clinic data safe.</p>
     <div class="agenda-grid">
       <div class="agenda-card">
         <div class="agenda-card-top">
@@ -1247,11 +1286,11 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
           </div>
         </div>
-        <h3>SQL Generation</h3>
-        <p>How plain language becomes safe queries — and the roadmap to make answers more reliable.</p>
+        <h3 data-i18n="s2.c1.h3">SQL Generation</h3>
+        <p data-i18n="s2.c1.p">How plain language becomes safe queries — and the roadmap to make answers more reliable.</p>
         <ul class="agenda-topics">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Schema-aware generation today</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Curated queries &amp; clarify-first</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s2.c1.li1">Schema-aware generation today</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s2.c1.li2">Curated queries &amp; clarify-first</span></li>
         </ul>
       </div>
       <div class="agenda-card">
@@ -1261,11 +1300,11 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
         </div>
-        <h3>Security &amp; Isolation</h3>
-        <p>Why letting AI query clinic data is safe — tenant boundaries and the SQL gate.</p>
+        <h3 data-i18n="s2.c2.h3">Security &amp; Isolation</h3>
+        <p data-i18n="s2.c2.p">Why letting AI query clinic data is safe — tenant boundaries and the SQL gate.</p>
         <ul class="agenda-topics">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>One database per clinic</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Read-only, validated SELECT only</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s2.c2.li1">One database per clinic</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s2.c2.li2">Read-only, validated SELECT only</span></li>
         </ul>
       </div>
     </div>
@@ -1275,10 +1314,10 @@
 <!-- ============ 3. BIG PICTURE ============ -->
 <section class="slide" data-nav-section>
   <div class="slide-inner">
-    <div class="kicker">Architecture</div>
-    <h2>The Big Picture</h2>
-    <p class="lead">The AI never touches the database directly — it only proposes SQL. Our application gate validates every query before anything runs.</p>
-    <div class="diagram">
+    <div class="kicker" data-i18n="s3.kicker">Architecture</div>
+    <h2 data-i18n="s3.h2">The Big Picture</h2>
+    <p class="lead" data-i18n="s3.lead">The AI never touches the database directly — it only proposes SQL. Our application gate validates every query before anything runs.</p>
+    <div class="diagram" data-mermaid-id="bigPicture">
       <pre class="mermaid">
 flowchart LR
   U["👩‍⚕️ Staff<br/>asks in plain language"] --> APP["🖥️ Application<br/>(FastAPI)"]
@@ -1297,9 +1336,9 @@ flowchart LR
       </pre>
     </div>
     <div class="pill-row">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> AI proposes — <b>our app</b> executes (never the model)</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> DELETE / DROP / sensitive columns → blocked</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Read-only DB · one clinic per database</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n-html="s3.pill1"> AI proposes — <b>our app</b> executes (never the model)</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s3.pill2"> DELETE / DROP / sensitive columns → blocked</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s3.pill3"> Read-only DB · one clinic per database</span></span>
     </div>
   </div>
 </section>
@@ -1308,18 +1347,18 @@ flowchart LR
 <section class="slide center">
   <div class="slide-inner">
     <div class="divider-num">01</div>
-    <h1>SQL Generation</h1>
-    <p class="divider-sub" style="margin-inline:auto">How a plain-language question becomes a safe, accurate database query.</p>
+    <h1 data-i18n="d1.h1">SQL Generation</h1>
+    <p class="divider-sub" style="margin-inline:auto" data-i18n="d1.sub">How a plain-language question becomes a safe, accurate database query.</p>
   </div>
 </section>
 
 <!-- ============ 4. SQL: CURRENT ============ -->
 <section class="slide">
   <div class="slide-inner">
-    <div class="kicker">01 · Current Approach</div>
-    <h2>Schema-Aware Generation</h2>
-    <p class="lead">The model is briefed with the exact database schema, business rules, and today's date — then proposes SQL as a <em>request</em>, not an action.</p>
-    <div class="diagram" id="sql-briefing-diagram">
+    <div class="kicker" data-i18n="s4.kicker">01 · Current Approach</div>
+    <h2 data-i18n="s4.h2">Schema-Aware Generation</h2>
+    <p class="lead" data-i18n-html="s4.lead">The model is briefed with the exact database schema, business rules, and today's date — then proposes SQL as a <em>request</em>, not an action.</p>
+    <div class="diagram" id="sql-briefing-diagram" data-mermaid-id="sqlBriefing">
       <pre class="mermaid">
 flowchart LR
   subgraph BRIEF["📋 Briefing (every request)"]
@@ -1342,10 +1381,10 @@ flowchart LR
   style ANS fill:#dbeafe,stroke:#2563eb,stroke-width:2px
       </pre>
     </div>
-    <div class="diagram-hint">Tip: click <b>Briefing</b> or <b>App validates &amp; executes</b> in the diagram for details.</div>
+    <div class="diagram-hint" data-i18n-html="s4.hint">Tip: click <b>Briefing</b> or <b>App validates &amp; executes</b> in the diagram for details.</div>
     <div class="pill-row">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Only knows tables we choose to expose</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Automatic row limits on every query</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s4.pill1"> Only knows tables we choose to expose</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s4.pill2"> Automatic row limits on every query</span></span>
     </div>
   </div>
 </section>
@@ -1353,66 +1392,66 @@ flowchart LR
 <!-- ============ 5. WHAT COULD GO WRONG: OVERVIEW ============ -->
 <section class="slide">
   <div class="slide-inner">
-    <div class="kicker rose">01 · Roadmap</div>
-    <h2>What Could Go Wrong</h2>
-    <p class="lead">The demo works — but these two things could go wrong anytime.</p>
+    <div class="kicker rose" data-i18n="s5.kicker">01 · Roadmap</div>
+    <h2 data-i18n="s5.h2">What Could Go Wrong</h2>
+    <p class="lead" data-i18n="s5.lead">The demo works — but these two things could go wrong anytime.</p>
     <div class="risk-grid">
       <div class="risk-card">
         <div class="risk-card-head">
           <span class="risk-num">1</span>
-          <h3>Same question, different answer</h3>
+          <h3 data-i18n="s5.r1.h3">Same question, different answer</h3>
         </div>
-        <p class="risk-desc">The AI writes fresh SQL each time, so everyday questions can return slightly different numbers.</p>
+        <p class="risk-desc" data-i18n="s5.r1.desc">The AI writes fresh SQL each time, so everyday questions can return slightly different numbers.</p>
         <div class="risk-example">
-          <div class="risk-question">"How many reservations today?"</div>
+          <div class="risk-question" data-i18n="s5.r1.q">"How many reservations today?"</div>
           <div class="risk-compare">
             <div class="risk-result">
-              <span class="label">Ask #1</span>
+              <span class="label" data-i18n="s5.r1.l1">Ask #1</span>
               <span class="value">18</span>
             </div>
-            <span class="risk-vs">vs</span>
+            <span class="risk-vs" data-i18n="s5.r2.vs">vs</span>
             <div class="risk-result">
-              <span class="label">Ask #2</span>
+              <span class="label" data-i18n="s5.r1.l2">Ask #2</span>
               <span class="value">17</span>
             </div>
           </div>
-          <div class="risk-callout">Same question — different count</div>
+          <div class="risk-callout" data-i18n="s5.r1.callout">Same question — different count</div>
         </div>
       </div>
       <div class="risk-card">
         <div class="risk-card-head">
           <span class="risk-num">2</span>
-          <h3>Vague questions, guessed answers</h3>
+          <h3 data-i18n="s5.r2.h3">Vague questions, guessed answers</h3>
         </div>
-        <p class="risk-desc">Staff ask in everyday language without dates or scope — the AI picks an interpretation and runs SQL without checking.</p>
+        <p class="risk-desc" data-i18n="s5.r2.desc">Staff ask in everyday language without dates or scope — the AI picks an interpretation and runs SQL without checking.</p>
         <div class="risk-example">
-          <div class="risk-question">"How are we doing?"</div>
+          <div class="risk-question" data-i18n="s5.r2.q">"How are we doing?"</div>
           <div class="risk-compare">
             <div class="risk-result">
-              <span class="label">This week</span>
+              <span class="label" data-i18n="s5.r2.l1">This week</span>
               <span class="value">42</span>
             </div>
-            <span class="risk-vs">or</span>
+            <span class="risk-vs" data-i18n="s5.r2.vs">or</span>
             <div class="risk-result">
-              <span class="label">This month</span>
+              <span class="label" data-i18n="s5.r2.l2" data-i18n="s6cp.chat.p3">This month</span>
               <span class="value">186</span>
             </div>
           </div>
-          <div class="risk-callout">Which interpretation did they mean?</div>
+          <div class="risk-callout" data-i18n="s5.r2.callout">Which interpretation did they mean?</div>
         </div>
       </div>
     </div>
-    <div class="slide-hint">Next slides dive deeper into each one</div>
+    <div class="slide-hint" data-i18n="s5.hint">Next slides dive deeper into each one</div>
   </div>
 </section>
 
 <!-- ============ 6a. WHAT COULD GO WRONG: SAME QUESTION ============ -->
 <section class="slide">
   <div class="slide-inner">
-    <div class="kicker teal">01 · Roadmap &nbsp;·&nbsp; 1 of 4</div>
-    <h2>Same question, different answer</h2>
+    <div class="kicker teal" data-i18n="s6a.kicker">01 · Roadmap &nbsp;·&nbsp; 1 of 4</div>
+    <h2 data-i18n="s5.r1.h3">Same question, different answer</h2>
     <div class="cols mt-lg">
-      <div class="diagram">
+      <div class="diagram" data-mermaid-id="curatedQuery">
         <pre class="mermaid">
 flowchart TB
   subgraph LIB["📚 Curated Query Library — question → verified SQL"]
@@ -1441,29 +1480,29 @@ flowchart TB
       </div>
       <div>
         <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
-          <div class="idea-demo-q" style="font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:10px">💬 "How many reservations today?"</div>
+          <div class="idea-demo-q" style="font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:10px" data-i18n="s6a.demo.q">💬 "How many reservations today?"</div>
           <div class="idea-demo-rows">
-            <span class="idea-demo-pill">Ask #1 → <b>18</b></span>
-            <span class="idea-demo-pill">Ask #2 → <b>17</b></span>
-            <span class="idea-demo-warn">⚠ same question, different count</span>
+            <span class="idea-demo-pill" data-i18n-html="s6a.demo.p1">Ask #1 → <b>18</b></span>
+            <span class="idea-demo-pill" data-i18n-html="s6a.demo.p2">Ask #2 → <b>17</b></span>
+            <span class="idea-demo-warn" data-i18n="s6a.demo.warn">⚠ same question, different count</span>
           </div>
         </div>
         <div class="roadmap-compare" style="margin-top:0">
           <div class="roadmap-panel problem">
-            <h4>Problem today</h4>
-            <p>Same question → new SQL generated each time → results can drift between asks.</p>
+            <h4 data-i18n="s6a.prob.h4">Problem today</h4>
+            <p data-i18n="s6a.prob.p">Same question → new SQL generated each time → results can drift between asks.</p>
           </div>
           <div class="roadmap-panel solution">
-            <h4>Planned fix</h4>
-            <p>Match to a curated query template — run pre-approved SQL from the library every time.</p>
+            <h4 data-i18n="s6a.sol.h4">Planned fix</h4>
+            <p data-i18n="s6a.sol.p">Match to a curated query template — run pre-approved SQL from the library every time.</p>
           </div>
         </div>
       </div>
     </div>
     <div class="pill-row">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Curated query library</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Pre-approved SQL templates</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Consistent answer every time</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6a.pill1"> Curated query library</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6a.pill2"> Pre-approved SQL templates</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6a.pill3"> Consistent answer every time</span></span>
     </div>
   </div>
 </section>
@@ -1471,61 +1510,61 @@ flowchart TB
 <!-- ============ 6a-practice. CURATED QUERIES IN PRACTICE ============ -->
 <section class="slide" data-nav-nested>
   <div class="slide-inner">
-    <div class="kicker teal">01 · Roadmap &nbsp;·&nbsp; 2 of 4</div>
-    <h2>Curated queries in practice</h2>
-    <p class="lead">Recommended chat experience for clinic owners — every suggestion maps to a pre-approved SQL template.</p>
+    <div class="kicker teal" data-i18n="s6ap.kicker">01 · Roadmap &nbsp;·&nbsp; 2 of 4</div>
+    <h2 data-i18n="s6ap.h2">Curated queries in practice</h2>
+    <p class="lead" data-i18n="s6ap.lead">Recommended chat experience for clinic owners — every suggestion maps to a pre-approved SQL template.</p>
     <div class="cols mt-lg" style="align-items:flex-start">
       <div class="chat-window">
-        <div class="chat-window-head">💬 Staff Assistant</div>
+        <div class="chat-window-head" data-i18n="s6ap.chat.head">💬 Staff Assistant</div>
         <div class="chat-mock">
           <div class="bubble bot">
-            <div class="b-label">Assistant</div>
-            How can I help you today?
+            <div class="b-label" data-i18n="s6ap.chat.b1.label">Assistant</div>
+            <span data-i18n="s6ap.chat.b1.text">How can I help you today?</span>
             <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
               <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#eff6ff;border:1.5px solid #2563eb;border-radius:8px;cursor:pointer;">
-                <span style="font-size:13px;font-weight:700;color:#1e40af;">📅 How many reservations today?</span>
+                <span style="font-size:13px;font-weight:700;color:#1e40af;" data-i18n="s6ap.chat.s1">📅 How many reservations today?</span>
                 <span style="font-size:16px;margin-left:auto;">🔥</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
                 <span style="font-size:18px;width:20px;text-align:center;">🧑‍⚕️</span>
-                <span style="font-size:13px;color:#334155;">New patients this month</span>
+                <span style="font-size:13px;color:#334155;" data-i18n="s6ap.chat.s2">New patients this month</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
                 <span style="font-size:18px;width:20px;text-align:center;">💰</span>
-                <span style="font-size:13px;color:#334155;">Revenue this week</span>
+                <span style="font-size:13px;color:#334155;" data-i18n="s6ap.chat.s3">Revenue this week</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
                 <span style="font-size:18px;width:20px;text-align:center;">⚠️</span>
-                <span style="font-size:13px;color:#334155;">No-shows by doctor</span>
+                <span style="font-size:13px;color:#334155;" data-i18n="s6ap.chat.s4">No-shows by doctor</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
                 <span style="font-size:18px;width:20px;text-align:center;">⭐</span>
-                <span style="font-size:13px;color:#334155;">Top treatment this month</span>
+                <span style="font-size:13px;color:#334155;" data-i18n="s6ap.chat.s5">Top treatment this month</span>
               </div>
             </div>
           </div>
-          <div class="bubble user">How many reservations today?</div>
+          <div class="bubble user" data-i18n="s6ap.chat.user">How many reservations today?</div>
           <div class="bubble bot">
-            <div class="b-label">Assistant</div>
-            You have <b>18 reservations</b> today — 12 confirmed, 4 pending, 2 walk-ins.
+            <div class="b-label" data-i18n="s6ap.chat.b1.label">Assistant</div>
+            <span data-i18n-html="s6ap.chat.b2.text">You have <b>18 reservations</b> today — 12 confirmed, 4 pending, 2 walk-ins.</span>
           </div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:14px;align-self:center;">
         <div style="padding:14px 16px;background:#eff6ff;border:1.5px dashed #2563eb;border-radius:12px;">
-          <div style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:4px;">↑ Each suggestion is a curated query</div>
-          <div style="font-size:13px;color:#1e40af;line-height:1.5">Tapping one maps directly to a pre-approved SQL template — no ad-hoc generation, same answer every time.</div>
+          <div style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:4px;" data-i18n="s6ap.note1.title">↑ Each suggestion is a curated query</div>
+          <div style="font-size:13px;color:#1e40af;line-height:1.5" data-i18n="s6ap.note1.text">Tapping one maps directly to a pre-approved SQL template — no ad-hoc generation, same answer every time.</div>
         </div>
         <div style="padding:14px 16px;background:#ecfdf5;border:1.5px dashed #0d9488;border-radius:12px;">
-          <div style="font-size:13px;font-weight:700;color:#065f46;margin-bottom:4px;">✅ Verified SQL used</div>
-          <div style="font-size:13px;color:#065f46;line-height:1.5">Matched curated query template from the library — same pre-approved SQL every time.</div>
+          <div style="font-size:13px;font-weight:700;color:#065f46;margin-bottom:4px;" data-i18n="s6ap.note2.title">✅ Verified SQL used</div>
+          <div style="font-size:13px;color:#065f46;line-height:1.5" data-i18n="s6ap.note2.text">Matched curated query template from the library — same pre-approved SQL every time.</div>
         </div>
       </div>
     </div>
     <div class="pill-row">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Curated query library</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Pre-approved SQL templates</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Consistent answer every time</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6a.pill1"> Curated query library</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6a.pill2"> Pre-approved SQL templates</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6a.pill3"> Consistent answer every time</span></span>
     </div>
   </div>
 </section>
@@ -1533,10 +1572,10 @@ flowchart TB
 <!-- ============ 6c. WHAT COULD GO WRONG: VAGUE QUESTIONS ============ -->
 <section class="slide">
   <div class="slide-inner">
-    <div class="kicker teal">01 · Roadmap &nbsp;·&nbsp; 3 of 4</div>
-    <h2>Vague questions, guessed answers</h2>
+    <div class="kicker teal" data-i18n="s6c.kicker">01 · Roadmap &nbsp;·&nbsp; 3 of 4</div>
+    <h2 data-i18n="s5.r2.h3">Vague questions, guessed answers</h2>
     <div class="cols mt-lg">
-      <div class="diagram">
+      <div class="diagram" data-mermaid-id="vagueQuestion">
         <pre class="mermaid">
 flowchart TB
   Q["💬 Staff: How are we doing?"] --> AGENT["🤖 Agent"]
@@ -1561,29 +1600,29 @@ flowchart TB
       </div>
       <div>
         <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
-          <div class="idea-demo-q" style="font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:10px">💬 "How are we doing?"</div>
+          <div class="idea-demo-q" style="font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:10px" data-i18n="s6c.demo.q">💬 "How are we doing?"</div>
           <div class="idea-demo-rows">
-            <span class="idea-demo-pill">This week → <b>42</b></span>
-            <span class="idea-demo-pill">This month → <b>186</b></span>
-            <span class="idea-demo-warn">⚠ which did they mean?</span>
+            <span class="idea-demo-pill" data-i18n-html="s6c.demo.p1">This week → <b>42</b></span>
+            <span class="idea-demo-pill" data-i18n-html="s6c.demo.p2">This month → <b>186</b></span>
+            <span class="idea-demo-warn" data-i18n="s6c.demo.warn">⚠ which did they mean?</span>
           </div>
         </div>
         <div class="roadmap-compare" style="margin-top:0">
           <div class="roadmap-panel problem">
-            <h4>Problem today</h4>
-            <p>Vague question → the AI silently picks dates, scope, or metrics → staff get an answer that may not match what they had in mind.</p>
+            <h4 data-i18n="s6c.prob.h4">Problem today</h4>
+            <p data-i18n="s6c.prob.p">Vague question → the AI silently picks dates, scope, or metrics → staff get an answer that may not match what they had in mind.</p>
           </div>
           <div class="roadmap-panel solution">
-            <h4>Planned fix</h4>
-            <p>Clarify-first — ask follow-up questions to pin down time range, metric, and scope before running any SQL.</p>
+            <h4 data-i18n="s6c.sol.h4">Planned fix</h4>
+            <p data-i18n="s6c.sol.p">Clarify-first — ask follow-up questions to pin down time range, metric, and scope before running any SQL.</p>
           </div>
         </div>
       </div>
     </div>
     <div class="pill-row">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Clarify-first conversations</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Ask before querying</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Transparent assumptions</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6c.pill1"> Clarify-first conversations</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6c.pill2"> Ask before querying</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6c.pill3"> Transparent assumptions</span></span>
     </div>
   </div>
 </section>
@@ -1591,63 +1630,63 @@ flowchart TB
 <!-- ============ 6c-practice. CLARIFY-FIRST IN PRACTICE ============ -->
 <section class="slide" data-nav-nested>
   <div class="slide-inner">
-    <div class="kicker teal">01 · Roadmap &nbsp;·&nbsp; 4 of 4</div>
-    <h2>Clarify-first in practice</h2>
-    <p class="lead">When a question is vague, the assistant asks follow-ups instead of guessing — then runs SQL once intent is clear.</p>
+    <div class="kicker teal" data-i18n="s6cp.kicker">01 · Roadmap &nbsp;·&nbsp; 4 of 4</div>
+    <h2 data-i18n="s6cp.h2">Clarify-first in practice</h2>
+    <p class="lead" data-i18n="s6cp.lead">When a question is vague, the assistant asks follow-ups instead of guessing — then runs SQL once intent is clear.</p>
     <div class="cols mt-lg" style="align-items:flex-start">
       <div class="chat-window">
-        <div class="chat-window-head">💬 Staff Assistant</div>
+        <div class="chat-window-head" data-i18n="s6ap.chat.head">💬 Staff Assistant</div>
         <div class="chat-mock">
-          <div class="bubble user">How are we doing?</div>
+          <div class="bubble user" data-i18n="s6cp.chat.user1">How are we doing?</div>
           <div class="bubble bot">
-            <div class="b-label">Assistant</div>
-            Happy to help — what would you like to check?
+            <div class="b-label" data-i18n="s6ap.chat.b1.label">Assistant</div>
+            <span data-i18n="s6cp.chat.b1.text">Happy to help — what would you like to check?</span>
             <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
               <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#eff6ff;border:1.5px solid #2563eb;border-radius:8px;cursor:pointer;">
-                <span style="font-size:13px;font-weight:700;color:#1e40af;">📅 Reservations</span>
+                <span style="font-size:13px;font-weight:700;color:#1e40af;" data-i18n="s6cp.chat.s1">📅 Reservations</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
                 <span style="font-size:18px;width:20px;text-align:center;">💰</span>
-                <span style="font-size:13px;color:#334155;">Revenue</span>
+                <span style="font-size:13px;color:#334155;" data-i18n="s6cp.chat.s2">Revenue</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;">
                 <span style="font-size:18px;width:20px;text-align:center;">🧑‍⚕️</span>
-                <span style="font-size:13px;color:#334155;">New patients</span>
+                <span style="font-size:13px;color:#334155;" data-i18n="s6cp.chat.s3">New patients</span>
               </div>
             </div>
           </div>
-          <div class="bubble user">Reservations</div>
+          <div class="bubble user" data-i18n="s6cp.chat.user2">Reservations</div>
           <div class="bubble bot">
-            <div class="b-label">Assistant</div>
-            For which period?
+            <div class="b-label" data-i18n="s6ap.chat.b1.label">Assistant</div>
+            <span data-i18n="s6cp.chat.b2.text">For which period?</span>
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
-              <span style="font-size:12px;font-weight:700;color:#1e40af;background:#eff6ff;border:1.5px solid #2563eb;border-radius:8px;padding:6px 10px;cursor:pointer;">Today</span>
-              <span style="font-size:12px;font-weight:700;color:#334155;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;cursor:pointer;">This week</span>
-              <span style="font-size:12px;font-weight:700;color:#334155;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;cursor:pointer;">This month</span>
+              <span style="font-size:12px;font-weight:700;color:#1e40af;background:#eff6ff;border:1.5px solid #2563eb;border-radius:8px;padding:6px 10px;cursor:pointer;" data-i18n="s6cp.chat.p1">Today</span>
+              <span style="font-size:12px;font-weight:700;color:#334155;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;cursor:pointer;" data-i18n="s6cp.chat.p2">This week</span>
+              <span style="font-size:12px;font-weight:700;color:#334155;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;cursor:pointer;" data-i18n="s6cp.chat.p3">This month</span>
             </div>
           </div>
-          <div class="bubble user">This week</div>
+          <div class="bubble user" data-i18n="s6cp.chat.user3">This week</div>
           <div class="bubble bot">
-            <div class="b-label">Assistant</div>
-            You have <b>42 reservations</b> this week — 31 completed, 8 upcoming, 3 cancelled.
+            <div class="b-label" data-i18n="s6ap.chat.b1.label">Assistant</div>
+            <span data-i18n-html="s6cp.chat.b3.text">You have <b>42 reservations</b> this week — 31 completed, 8 upcoming, 3 cancelled.</span>
           </div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:14px;align-self:center;">
         <div style="padding:14px 16px;background:#eff6ff;border:1.5px dashed #2563eb;border-radius:12px;">
-          <div style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:4px;">↑ Ask before querying</div>
-          <div style="font-size:13px;color:#1e40af;line-height:1.5">A vague question triggers follow-ups for metric and time range — no silent guesswork.</div>
+          <div style="font-size:13px;font-weight:700;color:#1e40af;margin-bottom:4px;" data-i18n="s6cp.note1.title">↑ Ask before querying</div>
+          <div style="font-size:13px;color:#1e40af;line-height:1.5" data-i18n="s6cp.note1.text">A vague question triggers follow-ups for metric and time range — no silent guesswork.</div>
         </div>
         <div style="padding:14px 16px;background:#ecfdf5;border:1.5px dashed #0d9488;border-radius:12px;">
-          <div style="font-size:13px;font-weight:700;color:#065f46;margin-bottom:4px;">✅ SQL runs after intent is clear</div>
-          <div style="font-size:13px;color:#065f46;line-height:1.5">Once staff pick reservations · this week, the assistant runs targeted SQL and states its assumptions.</div>
+          <div style="font-size:13px;font-weight:700;color:#065f46;margin-bottom:4px;" data-i18n="s6cp.note2.title">✅ SQL runs after intent is clear</div>
+          <div style="font-size:13px;color:#065f46;line-height:1.5" data-i18n="s6cp.note2.text">Once staff pick reservations · this week, the assistant runs targeted SQL and states its assumptions.</div>
         </div>
       </div>
     </div>
     <div class="pill-row">
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Clarify-first conversations</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Ask before querying</span>
-      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg> Transparent assumptions</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6c.pill1"> Clarify-first conversations</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6c.pill2"> Ask before querying</span></span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="dot-ok"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="s6c.pill3"> Transparent assumptions</span></span>
     </div>
   </div>
 </section>
@@ -1655,19 +1694,19 @@ flowchart TB
 <section class="slide center">
   <div class="slide-inner">
     <div class="divider-num">02</div>
-    <h1>Security &amp; Tenant Isolation</h1>
-    <p class="divider-sub" style="margin-inline:auto">Letting AI query your database sounds risky — here's exactly how we keep it safe.</p>
+    <h1 data-i18n="d2.h1">Security &amp; Tenant Isolation</h1>
+    <p class="divider-sub" style="margin-inline:auto" data-i18n="d2.sub">Letting AI query your database sounds risky — here's exactly how we keep it safe.</p>
   </div>
 </section>
 
 <!-- ============ 10. SECURITY: MENTAL MODEL ============ -->
 <section class="slide">
   <div class="slide-inner">
-    <div class="kicker">02 · The Core Idea</div>
-    <h2>Can the AI Run SQL on Our Database?</h2>
-    <p class="lead">No — the model only <em>proposes</em> SQL. Our app decides what runs: every query is validated and executed read-only on your clinic's database.</p>
+    <div class="kicker" data-i18n="s10.kicker">02 · The Core Idea</div>
+    <h2 data-i18n="s10.h2">Can the AI Run SQL on Our Database?</h2>
+    <p class="lead" data-i18n-html="s10.lead">No — the model only <em>proposes</em> SQL. Our app decides what runs: every query is validated and executed read-only on your clinic's database.</p>
     <div class="cols mt-lg">
-      <div class="diagram" id="sql-gate-diagram">
+      <div class="diagram" id="sql-gate-diagram" data-mermaid-id="sqlGate">
         <pre class="mermaid">
 flowchart LR
   Q["💬 Staff asks<br/>a question"] --> AI["🤖 AI drafts SQL<br/>(a proposal only)"]
@@ -1685,29 +1724,29 @@ flowchart LR
       <div class="sec-steps">
         <div class="sec-step">
           <span class="sec-step-num">1</span>
-          <div><strong>AI has no database connection</strong><span>It only outputs text — a SQL string. It cannot execute anything itself.</span></div>
+          <div><strong data-i18n="s10.step1.title">AI has no database connection</strong><span data-i18n="s10.step1.desc">It only outputs text — a SQL string. It cannot execute anything itself.</span></div>
         </div>
         <div class="sec-step">
           <span class="sec-step-num">2</span>
-          <div><strong>Our app parses every query</strong><span>The SQL Gate reads the query structure (AST) and rejects anything that breaks the rules.</span></div>
+          <div><strong data-i18n="s10.step2.title">Our app parses every query</strong><span data-i18n="s10.step2.desc">The SQL Gate reads the query structure (AST) and rejects anything that breaks the rules.</span></div>
         </div>
         <div class="sec-step">
           <span class="sec-step-num">3</span>
-          <div><strong>Only then does it run — read-only</strong><span>Approved SELECT queries run on a read-only DB user, scoped to the logged-in clinic.</span></div>
+          <div><strong data-i18n="s10.step3.title">Only then does it run — read-only</strong><span data-i18n="s10.step3.desc">Approved SELECT queries run on a read-only DB user, scoped to the logged-in clinic.</span></div>
         </div>
       </div>
     </div>
-    <div class="diagram-hint">Tip: click <b>SQL Gate</b>, <b>✅ approved</b>, or <b>❌ rejected</b> in the diagram for details.</div>
+    <div class="diagram-hint" data-i18n-html="s10.hint">Tip: click <b>SQL Gate</b>, <b>✅ approved</b>, or <b>❌ rejected</b> in the diagram for details.</div>
   </div>
 </section>
 
 <!-- ============ 11. SECURITY: CROSS-TENANT ============ -->
 <section class="slide">
   <div class="slide-inner">
-    <div class="kicker">02 · Tenant Isolation</div>
-    <h2>Can the AI Reach Another Clinic's Database?</h2>
-    <p class="lead">No — the application picks the database from the logged-in clinic. The AI has no say in which tenant it connects to.</p>
-    <div class="diagram mt-lg">
+    <div class="kicker" data-i18n="s11.kicker">02 · Tenant Isolation</div>
+    <h2 data-i18n="s11.h2">Can the AI Reach Another Clinic's Database?</h2>
+    <p class="lead" data-i18n="s11.lead">No — the application picks the database from the logged-in clinic. The AI has no say in which tenant it connects to.</p>
+    <div class="diagram mt-lg" data-mermaid-id="tenantIsolation">
       <pre class="mermaid">
 flowchart LR
   AI["🤖 AI Model"] -.->|"🚫 has no say in<br/>database selection"| X["✖️"]
@@ -1725,15 +1764,15 @@ flowchart LR
       <div class="verdict v-ok">
         <div class="big-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
         <div>
-          <h3>No — the model can't cross over</h3>
-          <p>The database is selected by the application, outside the AI's control. No prompt, no generated SQL can switch tenants.</p>
+          <h3 data-i18n="s11.v1.h3">No — the model can't cross over</h3>
+          <p data-i18n="s11.v1.p">The database is selected by the application, outside the AI's control. No prompt, no generated SQL can switch tenants.</p>
         </div>
       </div>
       <div class="verdict v-warn">
         <div class="big-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
         <div>
-          <h3>Demo scope: no login yet</h3>
-          <p>The demo trusts the tenant chosen on screen. Production would add login so each user is bound to their clinic.</p>
+          <h3 data-i18n="s11.v2.h3">Demo scope: no login yet</h3>
+          <p data-i18n="s11.v2.p">The demo trusts the tenant chosen on screen. Production would add login so each user is bound to their clinic.</p>
         </div>
       </div>
     </div>
@@ -1743,9 +1782,9 @@ flowchart LR
 <!-- ============ 15. CLOSING ============ -->
 <section class="slide center">
   <div class="slide-inner">
-    <div class="kicker">Thank You</div>
-    <h1>Questions &amp; Discussion</h1>
-    <p class="subtitle" style="margin-inline:auto">Safe by design today. Ready to grow into production tomorrow.</p>
+    <div class="kicker" data-i18n="s14.kicker">Thank You</div>
+    <h1 data-i18n="s14.h1">Questions &amp; Discussion</h1>
+    <p class="subtitle" style="margin-inline:auto" data-i18n="s14.sub">Safe by design today. Ready to grow into production tomorrow.</p>
   </div>
 </section>
 
@@ -1753,9 +1792,9 @@ flowchart LR
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="briefingModalTitle">
     <div class="modal-head">
       <div>
-        <span class="modal-kicker">Live Prompt Context</span>
-        <h3 id="briefingModalTitle">📋 Briefing Details (Per Request)</h3>
-        <p class="modal-sub">Before SQL generation, these inputs are injected into the agent context.</p>
+        <span class="modal-kicker" data-i18n="mb.kicker">Live Prompt Context</span>
+        <h3 id="briefingModalTitle" data-i18n="mb.title">📋 Briefing Details (Per Request)</h3>
+        <p class="modal-sub" data-i18n="mb.sub">Before SQL generation, these inputs are injected into the agent context.</p>
       </div>
       <button class="modal-close" id="briefingModalClose" aria-label="Close popup">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1763,15 +1802,15 @@ flowchart LR
     </div>
     <div class="modal-grid">
       <div class="modal-item feature">
-        <h4><span class="emoji">🗂️</span>Example Table Schemas</h4>
-        <p>Only approved columns are exposed to the agent context.</p>
+        <h4><span class="emoji">🗂️</span><span data-i18n="mb.s1.h4">Example Table Schemas</span></h4>
+        <p data-i18n="mb.s1.p">Only approved columns are exposed to the agent context.</p>
         <div class="modal-code">patient_users(id, clinic_code, created_at, deleted_at)
 patient_profiles(user_id, full_name, birth_date)
 reservations(id, patient_user_id, reservation_date, status)</div>
       </div>
       <div class="modal-item feature">
-        <h4><span class="emoji">🔗</span>Example Join Hints</h4>
-        <p>The briefing includes canonical join paths to avoid wrong joins.</p>
+        <h4><span class="emoji">🔗</span><span data-i18n="mb.s2.h4">Example Join Hints</span></h4>
+        <p data-i18n="mb.s2.p">The briefing includes canonical join paths to avoid wrong joins.</p>
         <div class="modal-code">reservations.patient_user_id = patient_users.id
 patient_profiles.user_id = patient_users.id
 service_items.reservation_id = reservations.id</div>
@@ -1784,13 +1823,13 @@ service_items.reservation_id = reservations.id</div>
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="executionModalTitle">
     <div class="modal-head">
       <div>
-        <h3 id="executionModalTitle">🛡️ App Validation &amp; Execution</h3>
+        <h3 id="executionModalTitle" data-i18n="me.title">🛡️ App Validation &amp; Execution</h3>
       </div>
       <button class="modal-close" id="executionModalClose" aria-label="Close popup">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="diagram modal-diagram">
+    <div class="diagram modal-diagram" data-mermaid-id="executionModal">
       <pre class="mermaid">
 flowchart LR
   AI["🤖 Agent<br/>proposes SQL"] --> RULES["📏 Validation rules<br/>(details below)"]
@@ -1808,13 +1847,13 @@ flowchart LR
       </pre>
     </div>
     <div class="modal-list" style="margin-top:14px">
-      <div>Only <code>SELECT</code> is allowed; non-SELECT statements are rejected.</div>
-      <div>Only one statement is allowed; multiple statements are blocked.</div>
-      <div>Only allowlisted tables can be queried.</div>
-      <div>Blocked columns cannot be selected.</div>
-      <div>Soft-delete tables must include <code>deleted_at IS NULL</code>.</div>
-      <div>If <code>LIMIT</code> is missing, the app auto-adds <code>LIMIT 100</code>.</div>
-      <div>If validation fails, the agent gets the error and retries with a corrected query.</div>
+      <div data-i18n-html="me.l1">Only <code>SELECT</code> is allowed; non-SELECT statements are rejected.</div>
+      <div data-i18n="me.l2">Only one statement is allowed; multiple statements are blocked.</div>
+      <div data-i18n="me.l3">Only allowlisted tables can be queried.</div>
+      <div data-i18n="me.l4">Blocked columns cannot be selected.</div>
+      <div data-i18n-html="me.l5">Soft-delete tables must include <code>deleted_at IS NULL</code>.</div>
+      <div data-i18n-html="me.l6">If <code>LIMIT</code> is missing, the app auto-adds <code>LIMIT 100</code>.</div>
+      <div data-i18n="me.l7">If validation fails, the agent gets the error and retries with a corrected query.</div>
     </div>
   </div>
 </div>
@@ -1823,35 +1862,35 @@ flowchart LR
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="promptContextModalTitle">
     <div class="modal-head">
       <div>
-        <span class="modal-kicker">System Prompt · English</span>
-        <h3 id="promptContextModalTitle">🧾 Prompt Context (Runtime Injection)</h3>
-        <p class="modal-sub">This is the system instruction shown when clicking the Prompt Context box.</p>
+        <span class="modal-kicker" data-i18n="mp.kicker">System Prompt · English</span>
+        <h3 id="promptContextModalTitle" data-i18n="mp.title">🧾 Prompt Context (Runtime Injection)</h3>
+        <p class="modal-sub" data-i18n="mp.sub">This is the system instruction shown when clicking the Prompt Context box.</p>
       </div>
       <button class="modal-close" id="promptContextModalClose" aria-label="Close popup">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="modal-item feature" style="grid-column: span 6; padding:0; border:none; box-shadow:none; background:transparent">
-      <div class="modal-code">You are an analytics assistant for clinic staff.
+      <div class="modal-code">あなたはクリニックのスタッフ向け分析アシスタントです。
 
-Language:
-- Use Japanese as the primary response language.
+言語:
+- 主に日本語を使用してください。
 
-Today's date:
+今日の日付:
 - $today$
 
-Available schema:
+利用可能なスキーマ:
 - $schema_context$
 
-Rules:
-- For data-related questions, call run_readonly_sql using a PostgreSQL SELECT query.
-- Follow each table's filters, prohibited columns, and examples defined in the schema context above.
-- Use LIMIT 100 unless you are using COUNT(*).
-- Summarize results in clear Japanese. Do not output raw JSON to users.
-- If the required table is not in the provided schema, explain that limitation.
-- Always answer in Japanese.
-- If your response includes detailed data or attachments, end with: "Please see the details below."
-- Do not explain internal system operations (file paths, S3, image processing, etc.) to users.</div>
+ルール:
+- データに関する質問には、PostgreSQL の SELECT クエリで run_readonly_sql を呼び出してください。
+- 上記スキーマの各テーブルのフィルター、選択禁止カラム、例に従ってください。
+- COUNT(*) を使う場合を除き、LIMIT 100 を使用してください。
+- 結果は平易な日本語で要約してください。生の JSON をユーザーに出力しないでください。
+- 質問に必要なテーブルがスキーマにない場合は、その制限を説明してください。
+- 常に日本語で回答してください。
+- 回答に詳細データや添付内容が伴う場合は、末尾に「詳細は下記をご確認ください。」と添えてください。
+- システムの内部動作（ファイルパス・S3・画像処理など）はユーザーに説明しないでください。</div>
     </div>
   </div>
 </div>
@@ -1860,21 +1899,21 @@ Rules:
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="sqlGateLayersModalTitle">
     <div class="modal-head">
       <div>
-        <span class="modal-kicker">02 · Defense in Depth</span>
-        <h3 id="sqlGateLayersModalTitle">🛡️ Six Independent Safety Layers</h3>
-        <p class="modal-sub">Every layer must pass before a single row is returned — even if one safeguard were bypassed, the others still protect your data.</p>
+        <span class="modal-kicker" data-i18n="ml.kicker">02 · Defense in Depth</span>
+        <h3 id="sqlGateLayersModalTitle" data-i18n="ml.title">🛡️ Six Independent Safety Layers</h3>
+        <p class="modal-sub" data-i18n="ml.sub">Every layer must pass before a single row is returned — even if one safeguard were bypassed, the others still protect your data.</p>
       </div>
       <button class="modal-close" id="sqlGateLayersModalClose" aria-label="Close popup">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="layers modal-layers">
-      <div class="layer"><span class="l-num">1</span><span class="l-title">🏢 One database per clinic</span><span class="l-desc">Physical separation — Clinic A and Clinic B never share tables or storage.<span class="l-example">App connects to clinic_a_db — not clinic_b_db</span></span></div>
-      <div class="layer"><span class="l-num">2</span><span class="l-title">🔒 Read-only credentials</span><span class="l-desc">The assistant's DB user has SELECT permission only — no INSERT, UPDATE, or DELETE.<span class="l-example">Even if DELETE slipped past the parser, the DB would refuse it</span></span></div>
-      <div class="layer"><span class="l-num">3</span><span class="l-title">🧬 SELECT-only parser gate</span><span class="l-desc">Every query is parsed as an AST; anything but a single SELECT is rejected.<span class="l-example">DELETE, DROP, TRUNCATE, UPDATE → all blocked at parse time</span></span></div>
-      <div class="layer"><span class="l-num">4</span><span class="l-title">📋 Table allowlist</span><span class="l-desc">Only 5 approved clinic tables; system catalogs and internals are blocked.<span class="l-example">patient_users, reservations, … — not pg_tables or information_schema</span></span></div>
-      <div class="layer"><span class="l-num">5</span><span class="l-title">🙈 Sensitive-column blocklist</span><span class="l-desc">Passwords, hashes, and encrypted fields can never be selected.<span class="l-example">password, email_hash, token columns → auto-detected and blocked</span></span></div>
-      <div class="layer"><span class="l-num">6</span><span class="l-title">✂️ Row cap &amp; soft-delete filter</span><span class="l-desc">Automatic LIMIT 100; deleted records require explicit deleted_at IS NULL.<span class="l-example">No runaway full-table dumps; archived rows stay hidden</span></span></div>
+      <div class="layer"><span class="l-num">1</span><span class="l-title" data-i18n="ml.l1.title">🏢 One database per clinic</span><span class="l-desc"><span data-i18n="ml.l1.desc">Physical separation — Clinic A and Clinic B never share tables or storage.</span><span class="l-example" data-i18n="ml.l1.ex">App connects to clinic_a_db — not clinic_b_db</span></span></div>
+      <div class="layer"><span class="l-num">2</span><span class="l-title" data-i18n="ml.l2.title">🔒 Read-only credentials</span><span class="l-desc"><span data-i18n="ml.l2.desc">The assistant's DB user has SELECT permission only — no INSERT, UPDATE, or DELETE.</span><span class="l-example" data-i18n="ml.l2.ex">Even if DELETE slipped past the parser, the DB would refuse it</span></span></div>
+      <div class="layer"><span class="l-num">3</span><span class="l-title" data-i18n="ml.l3.title">🧬 SELECT-only parser gate</span><span class="l-desc"><span data-i18n="ml.l3.desc">Every query is parsed as an AST; anything but a single SELECT is rejected.</span><span class="l-example" data-i18n="ml.l3.ex">DELETE, DROP, TRUNCATE, UPDATE → all blocked at parse time</span></span></div>
+      <div class="layer"><span class="l-num">4</span><span class="l-title" data-i18n="ml.l4.title">📋 Table allowlist</span><span class="l-desc"><span data-i18n="ml.l4.desc">Only 5 approved clinic tables; system catalogs and internals are blocked.</span><span class="l-example" data-i18n="ml.l4.ex">patient_users, reservations, … — not pg_tables or information_schema</span></span></div>
+      <div class="layer"><span class="l-num">5</span><span class="l-title" data-i18n="ml.l5.title">🙈 Sensitive-column blocklist</span><span class="l-desc"><span data-i18n="ml.l5.desc">Passwords, hashes, and encrypted fields can never be selected.</span><span class="l-example" data-i18n="ml.l5.ex">password, email_hash, token columns → auto-detected and blocked</span></span></div>
+      <div class="layer"><span class="l-num">6</span><span class="l-title" data-i18n="ml.l6.title">✂️ Row cap &amp; soft-delete filter</span><span class="l-desc"><span data-i18n="ml.l6.desc">Automatic LIMIT 100; deleted records require explicit deleted_at IS NULL.</span><span class="l-example" data-i18n="ml.l6.ex">No runaway full-table dumps; archived rows stay hidden</span></span></div>
     </div>
   </div>
 </div>
@@ -1883,9 +1922,9 @@ Rules:
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="sqlGateBlockedModalTitle">
     <div class="modal-head">
       <div>
-        <span class="modal-kicker">02 · Blocked Examples</span>
-        <h3 id="sqlGateBlockedModalTitle">❌ What the SQL Gate Rejects</h3>
-        <p class="modal-sub">Even if the AI tries something dangerous, the gate stops it before it touches your data.</p>
+        <span class="modal-kicker" data-i18n="mbk.kicker">02 · Blocked Examples</span>
+        <h3 id="sqlGateBlockedModalTitle" data-i18n="mbk.title">❌ What the SQL Gate Rejects</h3>
+        <p class="modal-sub" data-i18n="mbk.sub">Even if the AI tries something dangerous, the gate stops it before it touches your data.</p>
       </div>
       <button class="modal-close" id="sqlGateBlockedModalClose" aria-label="Close popup">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1893,24 +1932,24 @@ Rules:
     </div>
     <div class="modal-ex-stack">
       <div class="sec-ex-card blocked">
-        <h5>❌ Blocked — destructive command</h5>
-        <div class="staff-q">💬 "Delete all cancelled reservations"</div>
+        <h5 data-i18n="mbk.e1.h5">❌ Blocked — destructive command</h5>
+        <div class="staff-q" data-i18n="mbk.e1.q">💬 "Delete all cancelled reservations"</div>
         <div class="demo-code">DELETE FROM reservations
 WHERE status = 90</div>
-        <div class="sec-ex-verdict">🚫 Rejected: Only SELECT statements are allowed</div>
+        <div class="sec-ex-verdict" data-i18n="mbk.e1.v">🚫 Rejected: Only SELECT statements are allowed</div>
       </div>
       <div class="sec-ex-card blocked">
-        <h5>❌ Blocked — hidden system tables</h5>
-        <div class="staff-q">💬 "Show me all database tables"</div>
+        <h5 data-i18n="mbk.e2.h5">❌ Blocked — hidden system tables</h5>
+        <div class="staff-q" data-i18n="mbk.e2.q">💬 "Show me all database tables"</div>
         <div class="demo-code">SELECT * FROM pg_catalog.pg_tables</div>
-        <div class="sec-ex-verdict">🚫 Rejected: Table not on allowlist (only 5 clinic tables permitted)</div>
+        <div class="sec-ex-verdict" data-i18n="mbk.e2.v">🚫 Rejected: Table not on allowlist (only 5 clinic tables permitted)</div>
       </div>
       <div class="sec-ex-card blocked">
-        <h5>❌ Blocked — sensitive columns</h5>
-        <div class="staff-q">💬 "List patient passwords"</div>
+        <h5 data-i18n="mbk.e3.h5">❌ Blocked — sensitive columns</h5>
+        <div class="staff-q" data-i18n="mbk.e3.q">💬 "List patient passwords"</div>
         <div class="demo-code">SELECT password, email_hash
 FROM patient_users</div>
-        <div class="sec-ex-verdict">🚫 Rejected: Column not allowed (passwords &amp; hashes are blocked)</div>
+        <div class="sec-ex-verdict" data-i18n="mbk.e3.v">🚫 Rejected: Column not allowed (passwords &amp; hashes are blocked)</div>
       </div>
     </div>
   </div>
@@ -1920,9 +1959,9 @@ FROM patient_users</div>
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="sqlGateAllowedModalTitle">
     <div class="modal-head">
       <div>
-        <span class="modal-kicker">02 · Allowed Example</span>
-        <h3 id="sqlGateAllowedModalTitle">✅ What the SQL Gate Approves</h3>
-        <p class="modal-sub">A normal analytics query that passes all checks and runs safely on the read-only database.</p>
+        <span class="modal-kicker" data-i18n="mal.kicker">02 · Allowed Example</span>
+        <h3 id="sqlGateAllowedModalTitle" data-i18n="mal.title">✅ What the SQL Gate Approves</h3>
+        <p class="modal-sub" data-i18n="mal.sub">A normal analytics query that passes all checks and runs safely on the read-only database.</p>
       </div>
       <button class="modal-close" id="sqlGateAllowedModalClose" aria-label="Close popup">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1930,26 +1969,27 @@ FROM patient_users</div>
     </div>
     <div class="modal-ex-stack">
       <div class="sec-ex-card allowed">
-        <h5>✅ Allowed — normal analytics</h5>
-        <div class="staff-q">💬 "How many reservations today?"</div>
+        <h5 data-i18n="mal.e1.h5">✅ Allowed — normal analytics</h5>
+        <div class="staff-q" data-i18n="mal.e1.q">💬 "How many reservations today?"</div>
         <div class="demo-code">SELECT COUNT(*) FROM reservations
 WHERE deleted_at IS NULL
   AND start_at::date = CURRENT_DATE
 LIMIT 100</div>
-        <div class="sec-ex-verdict">✅ Runs safely — soft-delete filter enforced, LIMIT auto-added</div>
+        <div class="sec-ex-verdict" data-i18n="mal.e1.v">✅ Runs safely — soft-delete filter enforced, LIMIT auto-added</div>
       </div>
     </div>
   </div>
 </div>
 
 <div class="nav">
-  <button id="prev" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
-  <button id="next" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+  <button id="prev" data-i18n-aria="nav.prev" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <button id="next" data-i18n-aria="nav.next" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
 </div>
 
+<script src="how_it_works_i18n.js"></script>
 <script>
   mermaid.initialize({
-    startOnLoad: true,
+    startOnLoad: false,
     theme: "base",
     themeVariables: {
       fontFamily: "Inter, sans-serif",
@@ -1981,50 +2021,118 @@ LIMIT 100</div>
   const sqlGateBlockedModalClose = document.getElementById("sqlGateBlockedModalClose");
   const sqlGateAllowedModal = document.getElementById("sqlGateAllowedModal");
   const sqlGateAllowedModalClose = document.getElementById("sqlGateAllowedModalClose");
+  const langEnBtn = document.getElementById("langEn");
+  const langJaBtn = document.getElementById("langJa");
+  let currentLang = localStorage.getItem("howItWorksLang") || "en";
   let current = 0;
   let subNum = 0;
   let nestedNum = 0;
+  let slideNavButtons = [];
 
-  const slideNavButtons = slides.map((slide, idx) => {
-    const heading = slide.querySelector("h2, h1");
-    const kicker = slide.querySelector(".kicker");
-    const dividerNum = slide.querySelector(".divider-num");
-    const headingText = heading ? heading.textContent.trim().replace(/\s+/g, " ") : `Slide ${idx + 1}`;
-    const kickerText = kicker ? kicker.textContent.trim().replace(/\s+/g, " ") : "";
-    const dividerText = dividerNum ? `${dividerNum.textContent.trim().padStart(2, "0")} · ${headingText}` : "";
-    const isSection = idx === 0 || slide.hasAttribute("data-nav-section") || Boolean(dividerNum);
-    const isNested = slide.hasAttribute("data-nav-nested");
-    if (isSection) {
-      subNum = 0;
-      nestedNum = 0;
-    } else if (isNested) {
-      nestedNum += 1;
-    } else {
-      subNum += 1;
-      nestedNum = 0;
-    }
-    const rawLabel = idx === 0
-      ? "Introduction"
-      : (dividerText || headingText || kickerText || `Slide ${idx + 1}`);
-    const maxLen = isSection ? 28 : (isNested ? 22 : 26);
-    const compactLabel = rawLabel.length > maxLen ? rawLabel.slice(0, maxLen - 3).trim() + "..." : rawLabel;
+  function t(key) {
+    return (window.I18N_STRINGS[currentLang] && window.I18N_STRINGS[currentLang][key])
+      || (window.I18N_STRINGS.en && window.I18N_STRINGS.en[key])
+      || "";
+  }
 
-    const item = document.createElement("li");
-    const button = document.createElement("button");
-    button.type = "button";
-    const navLevel = isSection ? "section" : (isNested ? "sub-nested" : "sub");
-    button.className = `slide-sidebar-link ${navLevel}`;
-    const numMarkup = isSection
-      ? ""
-      : `<span class="num">${isNested ? `${subNum}.${nestedNum}` : `${subNum}.`}</span>`;
-    button.innerHTML = `${numMarkup}<span class="txt">${compactLabel}</span>`;
-    button.setAttribute("aria-label", `Go to slide ${idx + 1}`);
-    button.title = `${idx + 1}. ${[dividerText, kickerText, headingText].filter(Boolean).join(" · ")}`;
-    button.addEventListener("click", () => show(idx));
-    item.appendChild(button);
-    slideSidebarList.appendChild(item);
-    return button;
-  });
+  function applyLanguage(lang) {
+    currentLang = lang === "ja" ? "ja" : "en";
+    localStorage.setItem("howItWorksLang", currentLang);
+    document.documentElement.lang = currentLang;
+    document.title = t("meta.title");
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const val = t(el.getAttribute("data-i18n"));
+      if (val) el.textContent = val;
+    });
+    document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+      const val = t(el.getAttribute("data-i18n-html"));
+      if (val) el.innerHTML = val;
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+      const val = t(el.getAttribute("data-i18n-aria"));
+      if (val) el.setAttribute("aria-label", val);
+    });
+
+    langEnBtn.classList.toggle("active", currentLang === "en");
+    langJaBtn.classList.toggle("active", currentLang === "ja");
+    langEnBtn.setAttribute("aria-pressed", currentLang === "en" ? "true" : "false");
+    langJaBtn.setAttribute("aria-pressed", currentLang === "ja" ? "true" : "false");
+
+    rebuildSidebar();
+  }
+
+  async function renderMermaidDiagrams() {
+    document.querySelectorAll("[data-mermaid-id]").forEach((container) => {
+      const id = container.getAttribute("data-mermaid-id");
+      const src = window.I18N_MERMAID[id] && window.I18N_MERMAID[id][currentLang];
+      const pre = container.querySelector("pre.mermaid");
+      if (!pre || !src) return;
+      pre.removeAttribute("data-processed");
+      pre.textContent = src;
+    });
+    await mermaid.run({ querySelector: ".mermaid" });
+    resetDiagramBindings();
+  }
+
+  function resetDiagramBindings() {
+    document.querySelectorAll("[data-briefing-bound],[data-execution-bound],[data-prompt-context-bound],[data-sql-gate-bound],[data-edge-approved-bound],[data-edge-rejected-bound]").forEach((el) => {
+      delete el.dataset.briefingBound;
+      delete el.dataset.executionBound;
+      delete el.dataset.promptContextBound;
+      delete el.dataset.sqlGateBound;
+      delete el.dataset.edgeApprovedBound;
+      delete el.dataset.edgeRejectedBound;
+      el.classList.remove("clickable-briefing", "clickable-node", "clickable-edge", "edge-rejected");
+    });
+  }
+
+  function rebuildSidebar() {
+    slideSidebarList.innerHTML = "";
+    subNum = 0;
+    nestedNum = 0;
+    slideNavButtons = slides.map((slide, idx) => {
+      const heading = slide.querySelector("h2, h1");
+      const kicker = slide.querySelector(".kicker");
+      const dividerNum = slide.querySelector(".divider-num");
+      const headingText = heading ? heading.textContent.trim().replace(/\s+/g, " ") : `Slide ${idx + 1}`;
+      const kickerText = kicker ? kicker.textContent.trim().replace(/\s+/g, " ") : "";
+      const dividerText = dividerNum ? `${dividerNum.textContent.trim().padStart(2, "0")} · ${headingText}` : "";
+      const isSection = idx === 0 || slide.hasAttribute("data-nav-section") || Boolean(dividerNum);
+      const isNested = slide.hasAttribute("data-nav-nested");
+      if (isSection) {
+        subNum = 0;
+        nestedNum = 0;
+      } else if (isNested) {
+        nestedNum += 1;
+      } else {
+        subNum += 1;
+        nestedNum = 0;
+      }
+      const rawLabel = idx === 0
+        ? t("sidebar.intro")
+        : (dividerText || headingText || kickerText || `Slide ${idx + 1}`);
+      const maxLen = isSection ? 28 : (isNested ? 22 : 26);
+      const compactLabel = rawLabel.length > maxLen ? rawLabel.slice(0, maxLen - 3).trim() + "..." : rawLabel;
+
+      const item = document.createElement("li");
+      const button = document.createElement("button");
+      button.type = "button";
+      const navLevel = isSection ? "section" : (isNested ? "sub-nested" : "sub");
+      button.className = `slide-sidebar-link ${navLevel}`;
+      const numMarkup = isSection
+        ? ""
+        : `<span class="num">${isNested ? `${subNum}.${nestedNum}` : `${subNum}.`}</span>`;
+      button.innerHTML = `${numMarkup}<span class="txt">${compactLabel}</span>`;
+      button.setAttribute("aria-label", t("nav.goto").replace("{n}", idx + 1));
+      button.title = `${idx + 1}. ${[dividerText, kickerText, headingText].filter(Boolean).join(" · ")}`;
+      button.addEventListener("click", () => show(idx));
+      if (idx === current) button.classList.add("active");
+      item.appendChild(button);
+      slideSidebarList.appendChild(item);
+      return button;
+    });
+  }
 
   function openBriefingModal() {
     briefingModal.classList.add("open");
@@ -2107,7 +2215,7 @@ LIMIT 100</div>
     groups.forEach((group) => {
       const label = group.querySelector("g.cluster-label");
       const labelText = label ? label.textContent : "";
-      if (!labelText || !labelText.includes("Briefing (every request)")) return;
+      if (!labelText || !/Briefing|ブリーフィング/.test(labelText)) return;
       if (group.dataset.briefingBound === "1") return;
 
       group.dataset.briefingBound = "1";
@@ -2137,7 +2245,7 @@ LIMIT 100</div>
 
     nodes.forEach((node) => {
       const labelText = node.textContent || "";
-      const isValidationNode = labelText.includes("App validates") && labelText.includes("executes");
+      const isValidationNode = /App validates|アプリが検証/.test(labelText) && /executes|実行/.test(labelText);
       if (!isValidationNode) return;
       if (node.dataset.executionBound === "1") return;
 
@@ -2168,7 +2276,7 @@ LIMIT 100</div>
 
     nodes.forEach((node) => {
       const labelText = node.textContent || "";
-      const isPromptContextNode = labelText.includes("Prompt Context") && labelText.includes("runtime injection");
+      const isPromptContextNode = /Prompt Context|プロンプトコンテキスト/.test(labelText) && /runtime injection|ランタイム注入/.test(labelText);
       if (!isPromptContextNode) return;
       if (node.dataset.promptContextBound === "1") return;
 
@@ -2199,7 +2307,7 @@ LIMIT 100</div>
 
     nodes.forEach((node) => {
       const labelText = node.textContent || "";
-      const isSqlGateNode = labelText.includes("SQL Gate") && labelText.includes("6 rule");
+      const isSqlGateNode = /SQL Gate|SQLゲート/.test(labelText) && /6 rule|6つのルール/.test(labelText);
       if (!isSqlGateNode) return;
       if (node.dataset.sqlGateBound === "1") return;
 
@@ -2231,8 +2339,8 @@ LIMIT 100</div>
 
     edgeLabels.forEach((label) => {
       const text = (label.textContent || "").toLowerCase();
-      const isApproved = text.includes("approved");
-      const isRejected = text.includes("rejected");
+      const isApproved = text.includes("approved") || text.includes("承認");
+      const isRejected = text.includes("rejected") || text.includes("拒否");
       if (!isApproved && !isRejected) return;
 
       const boundKey = isApproved ? "edgeApprovedBound" : "edgeRejectedBound";
@@ -2323,19 +2431,38 @@ LIMIT 100</div>
     if (e.key === "End") show(slides.length - 1);
   });
 
-  let bindAttempts = 0;
-  const bindTimer = setInterval(() => {
-    bindAttempts += 1;
-    const boundBriefing = bindBriefingNodeClick();
-    const boundValidation = bindValidationNodeClick();
-    const boundPromptContext = bindPromptContextNodeClick();
-    const boundSqlGate = bindSqlGateNodeClick();
-    const boundSqlGateEdges = bindSqlGateEdgeClick();
-    if ((boundBriefing && boundValidation && boundPromptContext && boundSqlGate && boundSqlGateEdges) || bindAttempts >= 12) clearInterval(bindTimer);
-  }, 250);
+  function startDiagramBinding() {
+    let bindAttempts = 0;
+    const bindTimer = setInterval(() => {
+      bindAttempts += 1;
+      const boundBriefing = bindBriefingNodeClick();
+      const boundValidation = bindValidationNodeClick();
+      const boundPromptContext = bindPromptContextNodeClick();
+      const boundSqlGate = bindSqlGateNodeClick();
+      const boundSqlGateEdges = bindSqlGateEdgeClick();
+      if ((boundBriefing && boundValidation && boundPromptContext && boundSqlGate && boundSqlGateEdges) || bindAttempts >= 12) clearInterval(bindTimer);
+    }, 250);
+  }
 
-  const fromHash = parseInt(location.hash.slice(1), 10);
-  show(Number.isFinite(fromHash) ? fromHash - 1 : 0);
+  langEnBtn.addEventListener("click", async () => {
+    if (currentLang === "en") return;
+    applyLanguage("en");
+    await renderMermaidDiagrams();
+    startDiagramBinding();
+  });
+  langJaBtn.addEventListener("click", async () => {
+    if (currentLang === "ja") return;
+    applyLanguage("ja");
+    await renderMermaidDiagrams();
+    startDiagramBinding();
+  });
+
+  applyLanguage(currentLang);
+  renderMermaidDiagrams().then(() => {
+    startDiagramBinding();
+    const fromHash = parseInt(location.hash.slice(1), 10);
+    show(Number.isFinite(fromHash) ? fromHash - 1 : 0);
+  });
 </script>
 </body>
 </html>
